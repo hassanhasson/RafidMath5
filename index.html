@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>قياس ناتج التعلم | الصف الخامس</title>
+<style>
+  :root{
+    --border:#cfcfcf;
+    --text:#111;
+    --muted:#666;
+    --accent:#0b5cad;
+    --bg:#fff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#f7f7f7;color:var(--text);font-family:"Tahoma","Cairo",system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+  .page{max-width:1100px;margin:28px auto;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:8px}
+  header{display:flex;align-items:flex-start;gap:16px;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:12px}
+  h1{margin:0;flex:1;text-align:center;letter-spacing:.5px}
+  .student-box{min-width:320px;max-width:42%;border:1px solid var(--border);padding:8px 10px;border-radius:6px;background:#fafafa}
+  .student-box label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+  .student-box input{width:100%;border:1px solid var(--border);border-radius:4px;padding:8px 10px;font-size:14px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
+  .btn{border:1px solid var(--border);background:#fff;border-radius:6px;padding:8px 12px;font-size:14px;cursor:pointer}
+  .btn.primary{border-color:var(--accent);color:#fff;background:var(--accent)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  table{width:100%;border-collapse:collapse;background:#fff}
+  th,td{border:1px solid var(--border);padding:10px 8px;vertical-align:top}
+  th{background:#f0f4f8;font-weight:700}
+  td[contenteditable="true"]{outline:none}
+  td[placeholder]:empty:before{content:attr(placeholder);color:#aaa}
+  .col-unit{width:10rem}
+  .col-lesson{width:14rem}
+  .col-lo{width:28rem}
+  .col-ind{width:22rem}
+  .col-q{width:20rem}
+  tfoot td{border:none;padding-top:10px}
+  .meta{font-size:12px;color:var(--muted)}
+  @media print{
+    body{background:#fff}
+    .page{border:none;margin:0;max-width:none;border-radius:0}
+    header{border-bottom:1px solid #000}
+    .toolbar{display:none}
+    .student-box input{border:none;border-bottom:1px solid #000}
+    th{background:#eaeaea!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="student-box">
+        <label>اسم الطالب والصف والتاريخ</label>
+        <input id="studentLine" type="text" placeholder="مثال: محمد | 5/أ | 1447/02/12" />
+      </div>
+      <h1>قياس ناتج التعلم</h1>
+    </header>
+
+    <div class="toolbar">
+      <button class="btn primary" onclick="addRow()">+ إضافة صف</button>
+      <button class="btn" onclick="clearTable()">تفريغ الجدول</button>
+      <button class="btn" onclick="save()">حفظ</button>
+      <button class="btn" onclick="load()">استرجاع</button>
+      <button class="btn" onclick="exportJSON()">تصدير JSON</button>
+      <label class="btn">
+        استيراد JSON
+        <input id="fileIn" type="file" accept=".json,application/json" style="display:none" onchange="importJSON(this.files[0])" />
+      </label>
+      <button class="btn" onclick="window.print()">طباعة / PDF</button>
+      <span class="meta" id="savedAt"></span>
+    </div>
+
+    <table id="grid" aria-label="جدول قياس ناتج التعلم">
+      <thead>
+        <tr>
+          <th class="col-unit">الفصل</th>
+          <th class="col-lesson">الدرس</th>
+          <th class="col-lo">ناتج التعلم</th>
+          <th class="col-ind">المؤشر</th>
+          <th class="col-q">يمكن أضع السؤال هنا كتابة أو لصقًا أو استيراد من ملف</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- أمثلة أولية يمكنك تعديلها مباشرة -->
+        <tr>
+          <td contenteditable="true" placeholder="الفصل 1: القيمة المنزلية"></td>
+          <td contenteditable="true" placeholder="القيمة المنزلية ضمن البلايين"></td>
+          <td contenteditable="true" placeholder="وصف الأعداد ضمن 12 منزلة وقراءتها وكتابتها..."></td>
+          <td contenteditable="true" placeholder="المؤشر 1-1: يميز القيمة المنزلية..."></td>
+          <td contenteditable="true" placeholder="اكتب السؤال أو الصقه هنا"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <tfoot>
+      <tr><td colspan="5" class="meta">تلميح: انقر في أي خلية للكتابة. الحفظ يتم محليًا في المتصفح.</td></tr>
+    </tfoot>
+  </div>
+
+<script>
+  const KEY = "rafid_math5_table_v1";
+  const STUDENT_KEY = "rafid_math5_studentline_v1";
+
+  function addRow(data={unit:"",lesson:"",lo:"",ind:"",q:""}){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td contenteditable="true" placeholder="الفصل">${escapeHtml(data.unit||"")}</td>
+      <td contenteditable="true" placeholder="الدرس">${escapeHtml(data.lesson||"")}</td>
+      <td contenteditable="true" placeholder="ناتج التعلم">${escapeHtml(data.lo||"")}</td>
+      <td contenteditable="true" placeholder="المؤشر">${escapeHtml(data.ind||"")}</td>
+      <td contenteditable="true" placeholder="السؤال">${escapeHtml(data.q||"")}</td>
+    `;
+    document.querySelector("#grid tbody").appendChild(tr);
+    autosize();
+  }
+
+  function clearTable(){
+    if(!confirm("تفريغ كل الصفوف؟")) return;
+    document.querySelector("#grid tbody").innerHTML = "";
+    addRow();
+    saveStamp("");
+  }
+
+  function save(){
+    const rows=[...document.querySelectorAll("#grid tbody tr")].map(tr=>{
+      const tds=[...tr.children].map(td=>td.innerText.trim());
+      return {unit:tds[0],lesson:tds[1],lo:tds[2],ind:tds[3],q:tds[4]};
+    });
+    localStorage.setItem(KEY, JSON.stringify(rows));
+    localStorage.setItem(STUDENT_KEY, document.getElementById("studentLine").value.trim());
+    saveStamp(new Date());
+  }
+
+  function load(){
+    const raw=localStorage.getItem(KEY);
+    const line=localStorage.getItem(STUDENT_KEY)||"";
+    document.getElementById("studentLine").value=line;
+    document.querySelector("#grid tbody").innerHTML="";
+    if(raw){
+      try{
+        const rows=JSON.parse(raw);
+        rows.forEach(r=>addRow(r));
+        saveStamp(localStorage.getItem("rafid_math5_saved_at")||"");
+      }catch(e){ addRow(); }
+    }else{
+      addRow();
+    }
+  }
+
+  function exportJSON(){
+    const raw=localStorage.getItem(KEY)||"[]";
+    const blob=new Blob([raw],{type:"application/json;charset=utf-8"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="rafid_math5_data.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function importJSON(file){
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const rows=JSON.parse(e.target.result);
+        document.querySelector("#grid tbody").innerHTML="";
+        rows.forEach(r=>addRow(r));
+        save();
+      }catch(err){ alert("ملف غير صالح"); }
+    };
+    reader.readAsText(file,'utf-8');
+  }
+
+  function saveStamp(d){
+    const span=document.getElementById("savedAt");
+    if(!d){ span.textContent=""; localStorage.removeItem("rafid_math5_saved_at"); return; }
+    const s = new Date(d).toLocaleString('ar-SA');
+    span.textContent="آخر حفظ: "+s;
+    localStorage.setItem("rafid_math5_saved_at", s);
+  }
+
+  function escapeHtml(s){return (s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+  function autosize(){
+    // اجعل ارتفاع الخلية ينمو مع المحتوى (حل بسيط)
+    document.querySelectorAll('td[contenteditable="true"]').forEach(td=>{
+      td.addEventListener('input',()=>{ td.style.height='auto'; td.style.height=(td.scrollHeight+2)+'px'; });
+      td.style.height='auto'; td.style.height=(td.scrollHeight+2)+'px';
+    });
+  }
+
+  // حفظ تلقائي عند أي تعديل
+  document.addEventListener('input', e=>{
+    if(e.target.closest('#grid') || e.target.id==='studentLine'){ save(); }
+  });
+
+  window.addEventListener('load',()=>{ load(); autosize(); });
+</script>
+</body>
+</html>
