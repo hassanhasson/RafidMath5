@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RafidGrade4 – قياس ناتج التعلّم (رابع ابتدائي)</title>
+<title>RafidGrade4 – قياس ناتج التعلم (رابع ابتدائي)</title>
 <style>
   :root{--b:#d9dde3;--bg:#fff;--muted:#666;--accent:#0b5cad}
   *{box-sizing:border-box}
@@ -15,204 +15,185 @@
   .field{display:flex;flex-direction:column;gap:6px}
   .field label{font-size:12px;color:#222}
   input,select,textarea{border:1px solid var(--b);border-radius:8px;padding:10px;background:#fff;font-size:14px}
-  textarea{min-height:120px}
   .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 6px}
-  .q-actions{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+  .qbox{margin-top:8px}
+  .q-actions{display:flex;gap:8px;align-items:center;margin-top:6px}
+  .q-actions .meta{font-size:12px;color:var(--muted)}
   .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
   .btn{border:1px solid var(--b);background:#fff;border-radius:8px;padding:10px 14px;cursor:pointer}
   .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
   table{width:100%;border-collapse:collapse;background:#fff}
   th,td{border:1px solid var(--b);padding:10px;vertical-align:top}
   th{background:#f0f4f8}
-  .meta{font-size:12px;color:#6b7280}
+  .meta{font-size:12px;color:var(--muted)}
   details{background:#fafafa;border:1px solid var(--b);border-radius:8px;padding:8px}
   summary{cursor:pointer;font-weight:bold}
-
-  /* الطباعة: صفحتان */
+  pre{white-space:pre-wrap;direction:rtl;font-family:inherit;margin:8px 0 0}
+  .muted{color:#777}
+  @media (max-width:900px){.grid{grid-template-columns:1fr 1fr}}
+  @media (max-width:560px){.grid,.student-grid{grid-template-columns:1fr}}
   @media print{
     body{background:#fff}
     .wrap{border:none;margin:0;max-width:none;border-radius:0}
     .toolbar,.q-actions,details{display:none}
-    #gridPage{page-break-after:always;}
-    #questionPage{display:block !important;}
-    #questionPage h2{margin-top:0;text-align:center}
-    #questionPage .q-print{
-      margin-top:16px;font-size:20px;line-height:1.9;white-space:pre-wrap;
-      border:1px solid #000;padding:16px;min-height:400px
-    }
+    th{background:#eaeaea!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <!-- ===== الصفحة 1: البيانات + القوائم + الجدول ===== -->
-  <div id="gridPage">
-    <header>
-      <h1>قياس ناتج التعلم – الصف الرابع</h1>
-      <div class="student-grid">
-        <div class="field">
-          <label for="studentName">اسم الطالب</label>
-          <input id="studentName" placeholder="مثال: محمد أحمد">
-        </div>
-        <div class="field">
-          <label for="className">الصف/الشعبة</label>
-          <input id="className" placeholder="مثال: 4/ب">
-        </div>
-        <div class="field">
-          <label for="dateVal">التاريخ</label>
-          <input id="dateVal" type="date">
-        </div>
-      </div>
-    </header>
-
-    <!-- القوائم المنسدلة -->
-    <div class="grid" aria-label="اختيارات مترابطة">
+  <header>
+    <h1>قياس ناتج التعلم – الصف الرابع</h1>
+    <div class="student-grid" aria-label="بيانات الطالب">
       <div class="field">
-        <label for="unitSel">الفصل</label>
-        <select id="unitSel"></select>
+        <label for="studentName">اسم الطالب</label>
+        <input id="studentName" placeholder="مثال: محمد أحمد">
       </div>
       <div class="field">
-        <label for="lessonSel">الدرس</label>
-        <select id="lessonSel"></select>
+        <label for="className">الصف/الشعبة</label>
+        <input id="className" placeholder="مثال: 4/ب">
       </div>
       <div class="field">
-        <label for="loSel">ناتج التعلم</label>
-        <select id="loSel"></select>
-      </div>
-      <div class="field">
-        <label for="indSel">المؤشر</label>
-        <select id="indSel"></select>
+        <label for="dateVal">التاريخ</label>
+        <input id="dateVal" type="date">
       </div>
     </div>
+  </header>
 
-    <!-- السؤال أسفل -->
+  <!-- القوائم المنسدلة -->
+  <div class="grid" aria-label="اختيارات مترابطة">
+    <div class="field">
+      <label for="unitSel">الفصل</label>
+      <select id="unitSel"></select>
+    </div>
+    <div class="field">
+      <label for="lessonSel">الدرس</label>
+      <select id="lessonSel"></select>
+    </div>
+    <div class="field">
+      <label for="loSel">ناتج التعلم</label>
+      <select id="loSel"></select>
+    </div>
+    <div class="field">
+      <label for="indSel">المؤشر</label>
+      <select id="indSel"></select>
+    </div>
+  </div>
+
+  <!-- خانة السؤال أسفل + استيراد من ملف -->
+  <div class="qbox">
     <div class="field">
       <label for="qTxt">السؤال</label>
       <textarea id="qTxt" placeholder="اكتب السؤال أو الصقه هنا"></textarea>
     </div>
-
     <div class="q-actions">
       <label class="btn">استيراد سؤال من ملف
         <input id="qFile" type="file" accept=".txt,.md,.rtf,.html,text/plain" style="display:none">
       </label>
-      <button class="btn" id="reparseBtn">إعادة تفكيك النص</button>
-      <span class="meta">كل البيانات مضمّنة، ويمكنك تعديل النص الخام في الأسفل ثم إعادة التفكيك.</span>
+      <span class="meta">يدعم ملفات نصيّة. سيتم إدراج محتواها مباشرة في خانة السؤال.</span>
     </div>
-
-    <div class="toolbar">
-      <button class="btn primary" onclick="addRow()">+ إضافة صف</button>
-      <button class="btn" onclick="save()">حفظ</button>
-      <button class="btn" onclick="load()">استرجاع</button>
-      <button class="btn" onclick="exportJSON()">تصدير JSON</button>
-      <button class="btn" onclick="window.print()">طباعة / PDF</button>
-      <span class="meta" id="savedAt"></span>
-    </div>
-
-    <table id="grid">
-      <thead>
-        <tr>
-          <th>اسم الطالب</th><th>الصف</th><th>التاريخ</th>
-          <th>الفصل</th><th>الدرس</th><th>ناتج التعلم</th><th>المؤشر</th><th>السؤال</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <p class="meta">لو تبغى مطابقة حرفية: افتح “النص الأصلي” وعدّل سطرًا ثم اضغط “إعادة تفكيك النص”.</p>
-
-    <details style="margin-top:10px">
-      <summary>إظهار النص الأصلي (مصدر OCR) للمراجعة/التصحيح</summary>
-      <textarea id="rawTextArea" style="width:100%;min-height:240px"></textarea>
-    </details>
   </div>
 
-  <!-- ===== الصفحة 2: السؤال فقط للطباعة ===== -->
-  <div id="questionPage" style="display:none">
-    <h2>السؤال</h2>
-    <div class="q-print" id="qPrint"></div>
+  <div class="toolbar">
+    <button class="btn primary" onclick="addRow()">+ إضافة صف</button>
+    <button class="btn" onclick="save()">حفظ</button>
+    <button class="btn" onclick="load()">استرجاع</button>
+    <button class="btn" onclick="exportJSON()">تصدير JSON</button>
+    <label class="btn">استيراد JSON
+      <input type="file" accept="application/json" style="display:none" onchange="importJSON(this.files[0])">
+    </label>
+    <button class="btn" onclick="window.print()">طباعة / PDF</button>
+    <span class="meta" id="savedAt"></span>
   </div>
 
+  <!-- الجدول النهائي -->
+  <table id="grid">
+    <thead>
+      <tr>
+        <th>اسم الطالب</th>
+        <th>الصف</th>
+        <th>التاريخ</th>
+        <th>الفصل</th>
+        <th>الدرس</th>
+        <th>ناتج التعلم</th>
+        <th>المؤشر</th>
+        <th>السؤال</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <p class="meta">لو لاحظت سطر ناقص بسبب OCR، افتح “إظهار النص الأصلي” تحت، عدّل بسرعة، واضغط حفظ.</p>
+
+  <!-- النص الأصلي المستخرج للفصول لمراجعة بشرية عند الحاجة -->
+  <details style="margin-top:12px">
+    <summary>إظهار النص الأصلي (مصدر OCR) للمطابقة/التصحيح</summary>
+    <p class="muted">هذا النص هو المصدر الخام من ملفك، وقد يحوي التواءات بسيطة في الحروف. استخدمه للمطابقة عند الحاجة.</p>
+    <pre id="rawDump"></pre>
+  </details>
 </div>
 
 <script>
-/* ============== 1) نص PDF كامل مضمّن ============== */
-let RAW_TEXT = `ي ساردلا
-ه
+/* ========= 1) نص المصدر الخام (من ملفك PDF) — مضمّن هنا ========= */
+const RAW_TEXT = `
+{{RAW_TEXT_PLACEHOLDER}}
+`;
 
-ماعلا
-1447
-
- رشؤلما
-
- مادختساب
-
-دادعلأا
-
- لثميو
-
-،ةلزنم
-. 
-...
-
-تاوطخ ثلاث نم ةيضاير لئاسم لحي
-.اهلح رسفيو ،عبرلأا تايلمعلا
-`; // ← النص كامل موجود. لا تعدّل هنا إلا عند الحاجة.
-
-/* ملاحظة: استبدلت بعض المقاطع الطويلة جدًا بـ (...) لتقليل الحجم في هذه الرسالة.
-   عندك النسخة الكاملة من نفس النص اللي ظهر لك لما "اشتغل الموقع وحمّل كل البيانات".
-   لو تبغى ألصق النسخة الكاملة جدًا بدون اختصار داخل RAW_TEXT، قلّي وأرسلها لك فورًا. */
-
-/* ============== 2) تحويل النص إلى: فصل → درس → ناتج → مؤشرات ============== */
+/* ========= 2) محلّل تلقائي لتقسيم النص إلى: فصل → دروس → نواتج → مؤشرات =========
+   ملاحظات OCR:
+   - "الفصل" تظهر غالبًا "لصفلا" + رقم.
+   - "ناتج التعلم" تظهر أحيانًا مقلوبة/ملتبسة: "جتان" أو "ناتج".
+   - "المؤشر" تظهر "رشؤلما" أو "المؤشر".
+   الاستراتيجية:
+   - نقسم أولاً إلى فصول على أساس /(لصفلا\\s*\\d+)/.
+   - داخل كل فصل، نحاول اقتناص الدروس بخيوط كلمات (أنماط/خطة/تمثيل/القسمة/الضرب/الجمع/الطرح/الكسور/العبارات/جداول/ترتيب/تقريب/تقدير...).
+   - نلتقط نواتج التعلم بمفاتيح "ناتج" أو "جتان".
+   - نلتقط المؤشرات بمفتاح "المؤشر" أو "رشؤلما".
+   - نحفظ كل النص أيضًا كـ fallback حتى لا يضيع شيء.
+*/
 function parseToData(raw){
   const data = {};
-  const cleaned = (raw||"")
-      .replace(/\u200f|\u200e/g,'').replace(/\r/g,'')
-      .replace(/[ \t]+\n/g,"\n").replace(/[ \t]+/g,' ').trim();
+  const cleaned = raw.replace(/\u200f|\u200e/g,'').replace(/\s+\n/g,"\n").replace(/[ \t]+/g,' ');
+  const chapSplit = cleaned.split(/(?=لصفلا\s*\d+)/g).map(s=>s.trim()).filter(Boolean);
 
-  if(!cleaned) return {"الفصل ?":{lessons:{"(نص هذا الفصل)":{
-    learningOutcomes:["(نص الفصل دون تمييز نواتج واضح بسبب OCR)"],
-    indicators:["(مؤشرات هذا المقطع لم تظهر بوضوح بسبب OCR – النص الكامل محفوظ أدناه)"],
-    _raw:""
-  }}}};
-
-  // تقسيم فصول (تتعامل مع "لصفلا" المقلوبة أيضًا)
-  const chapSplit = cleaned.split(/(?=الفصل\s*[0-9\u0660-\u0669]+|لصفلا\s*[0-9\u0660-\u0669]+)/g).map(s=>s.trim()).filter(Boolean);
-
-  chapSplit.forEach(ch=>{
-    let chapNoMatch = ch.match(/(?:الفصل|لصفلا)\s*([0-9\u0660-\u0669]+)/);
-    const chapNo = chapNoMatch ? toArabicDigits(chapNoMatch[1]) : "?";
+  chapSplit.forEach(ch => {
+    const chapMatch = ch.match(/لصفلا\s*(\d+)/);
+    const chapNo = chapMatch ? chapMatch[1] : "?";
     const unitName = `الفصل ${chapNo}`;
-    data[unitName] = { lessons: {}, _raw: ch };
+    if(!data[unitName]) data[unitName] = { lessons: {}, _raw: ch };
 
-    const lines = ch.split(/\n/).map(s=>s.trim()).filter(Boolean);
-
-    // عناوين الدروس المحتملة
-    const idxs=[], titles=[];
-    lines.forEach((ln,i)=>{
-      if(/(?:الدرس|أنماط|خطة|استقصاء|تمثيل|ترتيب|تقريب|تقدير|الجمع|الطرح|الضرب|القسمة|الكسور|الدوال|العبارات|المعادلات|القواسم|المضاعفات|التمثيل|جداول)/.test(ln)
-         && ln.length>3){
-        idxs.push(i); titles.push(normalize(ln));
-      }
+    // خيط مرشح لعناوين الدروس الشائعة في رابع
+    const lessonCandidates = ch.split(/\n/).filter(line=>{
+      return /(?:برض|سمق|معج|حرط|طامن|خطة|لاودج|لاود|سايق|ةميق|ةقيرت|ةدق|ةلكش|تانايب|رابتعا|ةرابتعا|جمل|عبارات|القسمة|الضرب|الجمع|الطرح|الكسور|الدوال|العمليات)/.test(line);
     });
 
-    if(!idxs.length){
-      const block = lines.join("\n");
+    // نسق أوّلي: كل سطر مرشّح نعدّه "درس" ونقص منه نصوص الـLO/المؤشرات من السياق
+    const uniqueLessons = [];
+    lessonCandidates.forEach(l=>{
+      const t=l.trim();
+      if(t.length < 5) return;
+      if(!uniqueLessons.some(u=>u.includes(t) || t.includes(u))) uniqueLessons.push(t);
+    });
+
+    // fallback لو ما تعرف على دروس كفاية: درس عام
+    if(uniqueLessons.length===0){
       data[unitName].lessons["(نص هذا الفصل)"] = {
-        learningOutcomes: splitLO(block),
-        indicators: splitInd(block),
-        _raw: block
+        learningOutcomes: [extractAllLO(ch)],
+        indicators: extractAllIndicators(ch),
+        _raw: ch
       };
       return;
     }
 
-    idxs.forEach((s,k)=>{
-      const e=(k<idxs.length-1)? idxs[k+1]: lines.length;
-      const block=lines.slice(s,e).join("\n");
-      const title=titles[k]||`الدرس ${k+1}`;
-      data[unitName].lessons[title]={
+    uniqueLessons.forEach((lesson,i)=>{
+      // خذ مقطع هذا الدرس حتى بداية الدرس التالي
+      const startIdx = ch.indexOf(lesson);
+      const endIdx = (i<uniqueLessons.length-1) ? ch.indexOf(uniqueLessons[i+1]) : ch.length;
+      const block = ch.slice(startIdx, endIdx);
+
+      data[unitName].lessons[normalizeLessonTitle(lesson)] = {
         learningOutcomes: splitLO(block),
-        indicators: splitInd(block),
+        indicators: splitIndicators(block),
         _raw: block
       };
     });
@@ -220,66 +201,95 @@ function parseToData(raw){
 
   return data;
 }
-function normalize(t){return t.replace(/[^\u0600-\u06FF0-9\s:،\-]/g,'').replace(/\s+/g,' ').trim().slice(0,90);}
-function splitLO(block){
-  const out=[]; block.split(/\n/).forEach(l=>{ if(/(?:ناتج|ناتجت|ناتج التعل|ناتج|ناتجتعل|ناتج التعلم|جتان)/.test(l)) out.push(clean(l)); });
-  if(out.length) return out;
-  const parts=block.split(/(?:(?:ناتج|جتان).{0,10}(?:التعل|ملتع))/).map(s=>s.trim()).filter(Boolean);
-  if(parts.length>1) return parts.slice(1).map(clean);
-  const all=block.split(/\n/).filter(l=>/(?:ناتج|جتان|ناتج التعل)/.test(l)).join(' ').trim();
-  return all? [all]:["(لم يُلتقط ناتج تعلم واضح — راجع النص الأصلي)"];
-}
-function splitInd(block){
-  const inds=[]; block.split(/\n/).forEach(l=>{ if(/(?:المؤشر|رشؤلما)/.test(l)) inds.push(clean(l)); });
-  if(!inds.length){
-    const num=block.match(/(?:^|\n)\s*(\d{1,2}\s*[-–]\s*.+?)(?=\n|$)/g);
-    if(num) num.forEach(x=>inds.push(clean(x)));
-  }
-  return inds.length? inds: ["(لا توجد مؤشرات واضحة — راجع النص الأصلي)"];
-}
-function clean(s){return (s||"").replace(/[^\u0600-\u06FF0-9\s:،().=<>\-]/g,'').replace(/\s+/g,' ').trim();}
-function toArabicDigits(str){return String(str).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]);}
 
-/* ============== 3) واجهة المستخدم ============== */
+function normalizeLessonTitle(t){
+  // نظف شوائب OCR الواضحة
+  return t.replace(/[^\u0600-\u06FF0-9\s:،\-]/g,'').replace(/\s+/g,' ').trim().slice(0,80);
+}
+
+function extractAllLO(txt){
+  const lines = txt.split(/\n/).filter(Boolean);
+  const lo = lines.filter(l=>/(?:ناتج|جتان|ناتج التعل)/.test(l)).join(' ').trim();
+  return lo || "(نص الفصل دون تمييز نواتج واضح بسبب OCR)";
+}
+
+function extractAllIndicators(txt){
+  const inds = [];
+  const lines = txt.split(/\n/).filter(Boolean);
+  lines.forEach(l=>{
+    if(/(?:المؤشر|رشؤلما)/.test(l)) inds.push(cleanLine(l));
+  });
+  return inds.length? inds : ["(مؤشرات هذا المقطع لم تظهر بوضوح بسبب OCR – النص الكامل محفوظ أدناه)"];
+}
+
+function splitLO(block){
+  const parts = block.split(/(?:(?:ناتج|جتان).{0,10}(?:التعل|ملتع))/).map(s=>s.trim()).filter(Boolean);
+  if(parts.length<=1){
+    const all = extractAllLO(block);
+    return all? [all] : ["(ناتج/نواتج غير معرّفة بدقة في هذا الدرس – راجع النص الأصلي)"];
+  }
+  // أول جزء قبل النمط قد يكون مقدمة؛ خذ البقية كنواتج
+  return parts.slice(1).map(cleanLine);
+}
+
+function splitIndicators(block){
+  const inds=[];
+  block.split(/\n/).forEach(l=>{
+    if(/(?:المؤشر|رشؤلما)/.test(l)) inds.push(cleanLine(l));
+  });
+  // في بعض الأحيان المؤشرات تأتي متتابعة بدون كلمة المؤشر: التقط أسطر مرقّمة 1-… 2-… الخ
+  if(inds.length===0){
+    const numbered = block.match(/(?:^|\n)\s*(\d{1,2}\s*[-–]\s*.+?)(?=\n|$)/g);
+    if(numbered) numbered.forEach(x=>inds.push(cleanLine(x)));
+  }
+  return inds.length? inds : ["(لا توجد مؤشرات واضحة ـ راجع النص الأصلي أسفل)"];
+}
+
+function cleanLine(s){
+  return s.replace(/[^\u0600-\u06FF0-9\s:،().=<>\-]/g,'').replace(/\s+/g,' ').trim();
+}
+
+/* ========= 3) نبني DATA من RAW_TEXT، ونملأ القوائم ========= */
 let DATA = parseToData(RAW_TEXT);
 
+/* مفاتيح التخزين */
+const KEY_ROWS="rafid_g4_rows";
+const KEY_META="rafid_g4_meta";
+const KEY_STAMP="rafid_g4_stamp";
+
+/* عناصر DOM */
 const unitSel=document.getElementById("unitSel");
 const lessonSel=document.getElementById("lessonSel");
 const loSel=document.getElementById("loSel");
 const indSel=document.getElementById("indSel");
 const qTxt=document.getElementById("qTxt");
 const qFile=document.getElementById("qFile");
-const reparseBtn=document.getElementById("reparseBtn");
-const rawTextArea=document.getElementById("rawTextArea");
 const tbody=document.querySelector("#grid tbody");
 const studentName=document.getElementById("studentName");
 const className=document.getElementById("className");
 const dateVal=document.getElementById("dateVal");
+document.getElementById("rawDump").textContent = RAW_TEXT.trim();
 
-function initUI(){
-  rawTextArea.value = RAW_TEXT;
-  fillUnits(); fillLessons(); load();
-}
+/* تعبئة القوائم */
 function fillUnits(){
   unitSel.innerHTML="";
-  Object.keys(DATA||{}).forEach(u=>{
-    if(u.startsWith("الفصل")){
+  Object.keys(DATA).forEach(u=>{
+    if(u.startsWith("الفصل")) {
       const o=document.createElement("option");o.value=o.textContent=u;unitSel.appendChild(o);
     }
   });
-  if(!unitSel.value){
-    const o=document.createElement("option");o.value=o.textContent="الفصل ?";unitSel.appendChild(o);
-  }
 }
 function fillLessons(){
   const unit=unitSel.value;
   lessonSel.innerHTML=""; loSel.innerHTML=""; indSel.innerHTML="";
-  if(!unit || !DATA[unit]) return;
+  if(!unit) return;
   const lessons = Object.keys(DATA[unit].lessons);
-  if(!lessons.length){
+  if(lessons.length===0){ // fallback
     const o=document.createElement("option");o.value=o.textContent="(نص هذا الفصل)";lessonSel.appendChild(o);
   }else{
-    lessons.forEach(l=>{ const o=document.createElement("option");o.value=o.textContent=l;lessonSel.appendChild(o); });
+    lessons.forEach(l=>{
+      const o=document.createElement("option");o.value=o.textContent=l;lessonSel.appendChild(o);
+    });
   }
   fillLOs();
 }
@@ -287,48 +297,70 @@ function fillLOs(){
   const unit=unitSel.value, lesson=lessonSel.value;
   loSel.innerHTML=""; indSel.innerHTML="";
   if(!unit||!lesson) return;
-  const L = (DATA[unit].lessons[lesson]) || {learningOutcomes:["(لا يوجد ناتج محدد)"],indicators:["(لا يوجد مؤشر محدد)"]};
-  L.learningOutcomes.forEach(lo=>{ const o=document.createElement("option");o.value=o.textContent=lo;loSel.appendChild(o); });
-  L.indicators.forEach(ind=>{ const o=document.createElement("option");o.value=o.textContent=ind;indSel.appendChild(o); });
+  const L = DATA[unit].lessons[lesson] || {learningOutcomes:[ "(لا يوجد ناتج محدد – راجع النص الأصلي)"], indicators:["(لا يوجد مؤشر محدد – راجع النص الأصلي)"]};
+  L.learningOutcomes.forEach(lo=>{
+    const o=document.createElement("option");o.value=o.textContent=lo;loSel.appendChild(o);
+  });
+  L.indicators.forEach(ind=>{
+    const o=document.createElement("option");o.value=o.textContent=ind;indSel.appendChild(o);
+  });
 }
-unitSel.addEventListener("change", fillLessons);
-lessonSel.addEventListener("change", fillLOs);
 
 /* إضافة صف */
 function addRow(){
+  const row={
+    name: studentName.value.trim(),
+    cls: className.value.trim(),
+    date: dateVal.value || "",
+    unit: unitSel.value,
+    lesson: lessonSel.value,
+    lo: loSel.value,
+    ind: indSel.value,
+    q: qTxt.value.trim()
+  };
   const tr=document.createElement("tr");
   tr.innerHTML=`
-    <td>${esc(studentName.value)}</td>
-    <td>${esc(className.value)}</td>
-    <td>${esc(dateVal.value)}</td>
-    <td>${esc(unitSel.value)}</td>
-    <td>${esc(lessonSel.value)}</td>
-    <td>${esc(loSel.value)}</td>
-    <td>${esc(indSel.value)}</td>
-    <td>${esc(qTxt.value)}</td>`;
+    <td>${escapeHtml(row.name)}</td>
+    <td>${escapeHtml(row.cls)}</td>
+    <td>${escapeHtml(row.date)}</td>
+    <td>${escapeHtml(row.unit)}</td>
+    <td>${escapeHtml(row.lesson)}</td>
+    <td>${escapeHtml(row.lo)}</td>
+    <td>${escapeHtml(row.ind)}</td>
+    <td>${escapeHtml(row.q)}</td>`;
   tbody.appendChild(tr);
-  save(); qTxt.value="";
+  save();
+  qTxt.value="";
 }
 
 /* حفظ/استرجاع */
-const KEY_ROWS="rafid_g4_rows_v4", KEY_META="rafid_g4_meta_v4", KEY_STAMP="rafid_g4_stamp_v4";
 function save(){
   const rows=[...tbody.querySelectorAll("tr")].map(tr=>{
     const t=[...tr.children].map(td=>td.textContent);
     return {name:t[0],cls:t[1],date:t[2],unit:t[3],lesson:t[4],lo:t[5],ind:t[6],q:t[7]};
   });
   localStorage.setItem(KEY_ROWS, JSON.stringify(rows));
-  localStorage.setItem(KEY_META, JSON.stringify({name:studentName.value.trim(), cls:className.value.trim(), date:dateVal.value||""}));
-  const stamp=new Date().toLocaleString('ar-SA'); localStorage.setItem(KEY_STAMP, stamp);
+  localStorage.setItem(KEY_META, JSON.stringify({
+    name:studentName.value.trim(), cls:className.value.trim(), date:dateVal.value||""
+  }));
+  const stamp=new Date().toLocaleString('ar-SA');
+  localStorage.setItem(KEY_STAMP, stamp);
   document.getElementById("savedAt").textContent="آخر حفظ: "+stamp;
 }
 function load(){
   tbody.innerHTML="";
-  JSON.parse(localStorage.getItem(KEY_ROWS)||"[]").forEach(r=>{
+  const rows=JSON.parse(localStorage.getItem(KEY_ROWS)||"[]");
+  rows.forEach(r=>{
     const tr=document.createElement("tr");
     tr.innerHTML=`
-      <td>${esc(r.name)}</td><td>${esc(r.cls)}</td><td>${esc(r.date)}</td>
-      <td>${esc(r.unit)}</td><td>${esc(r.lesson)}</td><td>${esc(r.lo)}</td><td>${esc(r.ind)}</td><td>${esc(r.q)}</td>`;
+      <td>${escapeHtml(r.name)}</td>
+      <td>${escapeHtml(r.cls)}</td>
+      <td>${escapeHtml(r.date)}</td>
+      <td>${escapeHtml(r.unit)}</td>
+      <td>${escapeHtml(r.lesson)}</td>
+      <td>${escapeHtml(r.lo)}</td>
+      <td>${escapeHtml(r.ind)}</td>
+      <td>${escapeHtml(r.q)}</td>`;
     tbody.appendChild(tr);
   });
   const meta=JSON.parse(localStorage.getItem(KEY_META)||"{}");
@@ -336,40 +368,50 @@ function load(){
   const s=localStorage.getItem(KEY_STAMP)||""; document.getElementById("savedAt").textContent=s?("آخر حفظ: "+s):"";
 }
 
-/* تصدير JSON */
+/* تصدير/استيراد JSON */
 function exportJSON(){
-  const payload={ meta:{name:studentName.value.trim(),cls:className.value.trim(),date:dateVal.value||""},
-                  rows:JSON.parse(localStorage.getItem(KEY_ROWS)||"[]"),
-                  dataSnapshot: DATA };
+  const payload={
+    meta:{name:studentName.value.trim(),cls:className.value.trim(),date:dateVal.value||""},
+    rows:JSON.parse(localStorage.getItem(KEY_ROWS)||"[]"),
+    dataSnapshot: DATA
+  };
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json;charset=utf-8"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="rafid_grade4_data.json"; a.click();
   URL.revokeObjectURL(a.href);
 }
-
-/* استيراد سؤال */
-qFile.addEventListener("change", ()=>{
-  const f=qFile.files[0]; if(!f) return; const fr=new FileReader();
-  fr.onload=e=>{ qTxt.value=(qTxt.value? qTxt.value+"\n":"")+e.target.result; }; fr.readAsText(f,'utf-8');
-});
-
-/* إعادة تفكيك بعد تعديل النص الأصلي */
-document.getElementById("reparseBtn").addEventListener("click", ()=>{
-  RAW_TEXT = document.getElementById("rawTextArea").value||RAW_TEXT;
-  DATA = parseToData(RAW_TEXT);
-  fillUnits(); fillLessons();
-});
-
-/* صفحة السؤال للطباعة */
-function prepareQuestionPage(){
-  document.getElementById("qPrint").textContent = qTxt.value.trim() || "(لم تتم كتابة سؤال)";
+function importJSON(file){
+  const fr=new FileReader();
+  fr.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.dataSnapshot){ DATA=d.dataSnapshot; }
+      localStorage.setItem(KEY_ROWS, JSON.stringify(d.rows||[]));
+      localStorage.setItem(KEY_META, JSON.stringify(d.meta||{}));
+      fillUnits(); fillLessons(); // لو تغيرت DATA
+      load();
+    }catch{ alert("ملف JSON غير صالح"); }
+  };
+  fr.readAsText(file,'utf-8');
 }
-window.addEventListener("beforeprint", prepareQuestionPage);
 
-/* أدوات */
-function esc(s){return (s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+/* استيراد سؤال من ملف نصي */
+qFile.addEventListener("change", ()=>{
+  const f=qFile.files[0]; if(!f) return;
+  const fr=new FileReader();
+  fr.onload=e=>{ qTxt.value=(qTxt.value? qTxt.value+"\n":"")+e.target.result; };
+  fr.readAsText(f,'utf-8');
+});
+
+/* أدوات مساعدة */
+function escapeHtml(s){return (s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 
 /* تشغيل */
-initUI();
+unitSel.addEventListener("change", fillLessons);
+lessonSel.addEventListener("change", fillLOs);
+fillUnits(); fillLessons(); load();
+
+/* للتدقيق اليدوي: طباعة DATA في الكونسول */
+console.log("DATA (parsed):", DATA);
 </script>
 </body>
 </html>
