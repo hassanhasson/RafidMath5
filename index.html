@@ -122,6 +122,48 @@
     </thead>
     <tbody></tbody>
   </table>
+<style>
+  :root{--b:#d9dde3;--bg:#fff;--muted:#666;--accent:#0b5cad}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f6f7f9;font-family:"Tahoma","Cairo",system-ui}
+  .wrap{max-width:1150px;margin:28px auto;padding:16px;background:#fff;border:1px solid var(--b);border-radius:10px}
+  header{border-bottom:1px solid var(--b);padding-bottom:12px;margin-bottom:14px}
+  h1{margin:0;text-align:center}
+  .student-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:12px;color:#222}
+  input,select,textarea{border:1px solid var(--b);border-radius:8px;padding:10px;background:#fff;font-size:14px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 6px}
+  .qbox{margin-top:8px}
+  .q-actions{display:flex;gap:8px;align-items:center;margin-top:6px}
+  .q-actions .meta{font-size:12px;color:var(--muted)}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .btn{border:1px solid var(--b);background:#fff;border-radius:8px;padding:10px 14px;cursor:pointer}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  table{width:100%;border-collapse:collapse;background:#fff}
+  th,td{border:1px solid var(--b);padding:10px;vertical-align:top}
+  th{background:#f0f4f8}
+  .meta{font-size:12px;color:var(--muted)}
+  details{background:#fafafa;border:1px solid var(--b);border-radius:8px;padding:8px}
+  summary{cursor:pointer;font-weight:bold}
+  pre{white-space:pre-wrap;direction:rtl;font-family:inherit;margin:8px 0 0}
+  .muted{color:#777}
+
+  /* للطباعة */
+  @media print {
+    body{background:#fff}
+    .wrap{border:none;margin:0;max-width:none;border-radius:0}
+    .toolbar,.q-actions,details{display:none}
+
+    /* الصفحة الأولى: الجدول والبيانات */
+    #gridPage {page-break-after:always;}
+
+    /* الصفحة الثانية: السؤال فقط */
+    #questionPage{display:block;}
+    #questionPage h2{margin-top:0;text-align:center}
+    #questionPage .q-print{margin-top:20px;font-size:18px;line-height:1.8;white-space:pre-wrap;border:1px solid #000;padding:15px;min-height:300px}
+  }
+</style>
 
   <p class="meta">لو لاحظت سطر ناقص بسبب OCR، افتح “إظهار النص الأصلي” تحت، عدّل بسرعة، واضغط حفظ.</p>
 
@@ -412,6 +454,19 @@ fillUnits(); fillLessons(); load();
 
 /* للتدقيق اليدوي: طباعة DATA في الكونسول */
 console.log("DATA (parsed):", DATA);
+/* تجهيز صفحة السؤال عند الطباعة */
+function prepareQuestionPage(){
+  document.getElementById("qPrint").textContent = qTxt.value.trim() || "(لم تتم كتابة سؤال)";
+}
+window.addEventListener("beforeprint", prepareQuestionPage);
+
 </script>
 </body>
 </html>
+
+<div id="gridPage"></div>
+
+<div id="questionPage" style="display:none">
+  <h2>السؤال</h2>
+  <div class="q-print" id="qPrint"></div>
+</div>
