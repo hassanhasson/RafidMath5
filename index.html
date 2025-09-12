@@ -17,7 +17,7 @@
   input,select,textarea{border:1px solid var(--b);border-radius:8px;padding:10px;background:#fff;font-size:14px}
   .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 6px}
   .qbox{margin-top:8px}
-  .q-actions{display:flex;gap:8px;align-items:center;margin-top:6px}
+  .q-actions{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
   .q-actions .meta{font-size:12px;color:var(--muted)}
   .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
   .btn{border:1px solid var(--b);background:#fff;border-radius:8px;padding:10px 14px;cursor:pointer}
@@ -30,210 +30,223 @@
   summary{cursor:pointer;font-weight:bold}
   pre{white-space:pre-wrap;direction:rtl;font-family:inherit;margin:8px 0 0}
   .muted{color:#777}
-  @media (max-width:900px){.grid{grid-template-columns:1fr 1fr}}
-  @media (max-width:560px){.grid,.student-grid{grid-template-columns:1fr}}
-  @media print{
-    body{background:#fff}
-    .wrap{border:none;margin:0;max-width:none;border-radius:0}
-    .toolbar,.q-actions,details{display:none}
-    th{background:#eaeaea!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  }
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header>
-    <h1>قياس ناتج التعلم – الصف الرابع</h1>
-    <div class="student-grid" aria-label="بيانات الطالب">
-      <div class="field">
-        <label for="studentName">اسم الطالب</label>
-        <input id="studentName" placeholder="مثال: محمد أحمد">
-      </div>
-      <div class="field">
-        <label for="className">الصف/الشعبة</label>
-        <input id="className" placeholder="مثال: 4/ب">
-      </div>
-      <div class="field">
-        <label for="dateVal">التاريخ</label>
-        <input id="dateVal" type="date">
-      </div>
-    </div>
-  </header>
+  .pair{display:flex;gap:8px;flex-wrap:wrap}
 
-  <!-- القوائم المنسدلة -->
-  <div class="grid" aria-label="اختيارات مترابطة">
-    <div class="field">
-      <label for="unitSel">الفصل</label>
-      <select id="unitSel"></select>
-    </div>
-    <div class="field">
-      <label for="lessonSel">الدرس</label>
-      <select id="lessonSel"></select>
-    </div>
-    <div class="field">
-      <label for="loSel">ناتج التعلم</label>
-      <select id="loSel"></select>
-    </div>
-    <div class="field">
-      <label for="indSel">المؤشر</label>
-      <select id="indSel"></select>
-    </div>
-  </div>
-
-  <!-- خانة السؤال أسفل + استيراد من ملف -->
-  <div class="qbox">
-    <div class="field">
-      <label for="qTxt">السؤال</label>
-      <textarea id="qTxt" placeholder="اكتب السؤال أو الصقه هنا"></textarea>
-    </div>
-    <div class="q-actions">
-      <label class="btn">استيراد سؤال من ملف
-        <input id="qFile" type="file" accept=".txt,.md,.rtf,.html,text/plain" style="display:none">
-      </label>
-      <span class="meta">يدعم ملفات نصيّة. سيتم إدراج محتواها مباشرة في خانة السؤال.</span>
-    </div>
-  </div>
-
-  <div class="toolbar">
-    <button class="btn primary" onclick="addRow()">+ إضافة صف</button>
-    <button class="btn" onclick="save()">حفظ</button>
-    <button class="btn" onclick="load()">استرجاع</button>
-    <button class="btn" onclick="exportJSON()">تصدير JSON</button>
-    <label class="btn">استيراد JSON
-      <input type="file" accept="application/json" style="display:none" onchange="importJSON(this.files[0])">
-    </label>
-    <button class="btn" onclick="window.print()">طباعة / PDF</button>
-    <span class="meta" id="savedAt"></span>
-  </div>
-
-  <!-- الجدول النهائي -->
-  <table id="grid">
-    <thead>
-      <tr>
-        <th>اسم الطالب</th>
-        <th>الصف</th>
-        <th>التاريخ</th>
-        <th>الفصل</th>
-        <th>الدرس</th>
-        <th>ناتج التعلم</th>
-        <th>المؤشر</th>
-        <th>السؤال</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-<style>
-  :root{--b:#d9dde3;--bg:#fff;--muted:#666;--accent:#0b5cad}
-  *{box-sizing:border-box}
-  body{margin:0;background:#f6f7f9;font-family:"Tahoma","Cairo",system-ui}
-  .wrap{max-width:1150px;margin:28px auto;padding:16px;background:#fff;border:1px solid var(--b);border-radius:10px}
-  header{border-bottom:1px solid var(--b);padding-bottom:12px;margin-bottom:14px}
-  h1{margin:0;text-align:center}
-  .student-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
-  .field{display:flex;flex-direction:column;gap:6px}
-  .field label{font-size:12px;color:#222}
-  input,select,textarea{border:1px solid var(--b);border-radius:8px;padding:10px;background:#fff;font-size:14px}
-  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 6px}
-  .qbox{margin-top:8px}
-  .q-actions{display:flex;gap:8px;align-items:center;margin-top:6px}
-  .q-actions .meta{font-size:12px;color:var(--muted)}
-  .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
-  .btn{border:1px solid var(--b);background:#fff;border-radius:8px;padding:10px 14px;cursor:pointer}
-  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-  table{width:100%;border-collapse:collapse;background:#fff}
-  th,td{border:1px solid var(--b);padding:10px;vertical-align:top}
-  th{background:#f0f4f8}
-  .meta{font-size:12px;color:var(--muted)}
-  details{background:#fafafa;border:1px solid var(--b);border-radius:8px;padding:8px}
-  summary{cursor:pointer;font-weight:bold}
-  pre{white-space:pre-wrap;direction:rtl;font-family:inherit;margin:8px 0 0}
-  .muted{color:#777}
-
-  /* للطباعة */
+  /* للطباعة: صفحتان */
   @media print {
     body{background:#fff}
     .wrap{border:none;margin:0;max-width:none;border-radius:0}
     .toolbar,.q-actions,details{display:none}
 
-    /* الصفحة الأولى: الجدول والبيانات */
-    #gridPage {page-break-after:always;}
+    /* الصفحة الأولى: كل شيء حتى #gridPage */
+    #gridPage{page-break-after:always;}
 
     /* الصفحة الثانية: السؤال فقط */
-    #questionPage{display:block;}
+    #questionPage{display:block !important;}
     #questionPage h2{margin-top:0;text-align:center}
-    #questionPage .q-print{margin-top:20px;font-size:18px;line-height:1.8;white-space:pre-wrap;border:1px solid #000;padding:15px;min-height:300px}
+    #questionPage .q-print{
+      margin-top:20px;font-size:20px;line-height:1.9;white-space:pre-wrap;
+      border:1px solid #000;padding:16px;min-height:400px
+    }
   }
 </style>
+</head>
+<body>
+<div class="wrap">
 
-  <p class="meta">لو لاحظت سطر ناقص بسبب OCR، افتح “إظهار النص الأصلي” تحت، عدّل بسرعة، واضغط حفظ.</p>
+  <!-- ===== الصفحة الأولى (البيانات + الجدول) ===== -->
+  <div id="gridPage">
+    <header>
+      <h1>قياس ناتج التعلم – الصف الرابع</h1>
+      <div class="student-grid" aria-label="بيانات الطالب">
+        <div class="field">
+          <label for="studentName">اسم الطالب</label>
+          <input id="studentName" placeholder="مثال: محمد أحمد">
+        </div>
+        <div class="field">
+          <label for="className">الصف/الشعبة</label>
+          <input id="className" placeholder="مثال: 4/ب">
+        </div>
+        <div class="field">
+          <label for="dateVal">التاريخ</label>
+          <input id="dateVal" type="date">
+        </div>
+      </div>
+    </header>
 
-  <!-- النص الأصلي المستخرج للفصول لمراجعة بشرية عند الحاجة -->
-  <details style="margin-top:12px">
-    <summary>إظهار النص الأصلي (مصدر OCR) للمطابقة/التصحيح</summary>
-    <p class="muted">هذا النص هو المصدر الخام من ملفك، وقد يحوي التواءات بسيطة في الحروف. استخدمه للمطابقة عند الحاجة.</p>
-    <pre id="rawDump"></pre>
-  </details>
-</div>
+    <!-- القوائم المنسدلة -->
+    <div class="grid" aria-label="اختيارات مترابطة">
+      <div class="field">
+        <label for="unitSel">الفصل</label>
+        <select id="unitSel"></select>
+      </div>
+      <div class="field">
+        <label for="lessonSel">الدرس</label>
+        <select id="lessonSel"></select>
+      </div>
+      <div class="field">
+        <label for="loSel">ناتج التعلم</label>
+        <select id="loSel"></select>
+      </div>
+      <div class="field">
+        <label for="indSel">المؤشر</label>
+        <select id="indSel"></select>
+      </div>
+    </div>
+
+    <!-- خانة السؤال أسفل + استيراد من ملف -->
+    <div class="qbox">
+      <div class="field">
+        <label for="qTxt">السؤال</label>
+        <textarea id="qTxt" placeholder="اكتب السؤال أو الصقه هنا"></textarea>
+      </div>
+      <div class="q-actions">
+        <div class="pair">
+          <label class="btn">استيراد سؤال من ملف
+            <input id="qFile" type="file" accept=".txt,.md,.rtf,.html,text/plain" style="display:none">
+          </label>
+          <label class="btn">استيراد نص المصدر (TXT)
+            <input id="rawFile" type="file" accept=".txt,text/plain" style="display:none">
+          </label>
+        </div>
+        <button class="btn" id="reparseBtn" title="إعادة تفكيك النص إلى فصول ودروس">إعادة تفكيك النص</button>
+        <span class="meta">لو الملف PDF صورة: حوّله نصًا (OCR) ثم استورده هنا، وسيتم تفكيكه إلى (فصل → درس → ناتج → مؤشر).</span>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn primary" onclick="addRow()">+ إضافة صف</button>
+      <button class="btn" onclick="save()">حفظ</button>
+      <button class="btn" onclick="load()">استرجاع</button>
+      <button class="btn" onclick="exportJSON()">تصدير JSON</button>
+      <label class="btn">استيراد JSON
+        <input id="jsonIn" type="file" accept="application/json" style="display:none">
+      </label>
+      <button class="btn" onclick="window.print()">طباعة / PDF</button>
+      <span class="meta" id="savedAt"></span>
+    </div>
+
+    <!-- الجدول النهائي -->
+    <table id="grid">
+      <thead>
+        <tr>
+          <th>اسم الطالب</th>
+          <th>الصف</th>
+          <th>التاريخ</th>
+          <th>الفصل</th>
+          <th>الدرس</th>
+          <th>ناتج التعلم</th>
+          <th>المؤشر</th>
+          <th>السؤال</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <p class="meta">اختر الفصل ثم الدرس ثم ناتج التعلم ثم المؤشر. أضف سؤالك ثم “إضافة صف”.</p>
+
+    <!-- النص الأصلي المستخرج للفصول لمراجعة يدوية -->
+    <details style="margin-top:12px">
+      <summary>إظهار النص الأصلي (مصدر OCR) للمطابقة/التصحيح</summary>
+      <p class="muted">هذا النص هو المصدر الخام (يمكنك لصقه أو استيراده). عند الضغط على "إعادة تفكيك النص" سيتم توليد القوائم منه.</p>
+      <textarea id="rawTextArea" style="width:100%;min-height:200px"></textarea>
+      <pre id="rawDump" class="muted" style="display:none"></pre>
+    </details>
+  </div><!-- /gridPage -->
+
+  <!-- ===== الصفحة الثانية (السؤال فقط للطباعة) ===== -->
+  <div id="questionPage" style="display:none">
+    <h2>السؤال</h2>
+    <div class="q-print" id="qPrint"></div>
+  </div>
+
+</div><!-- /.wrap -->
 
 <script>
-/* ========= 1) نص المصدر الخام (من ملفك PDF) — مضمّن هنا ========= */
-const RAW_TEXT = `
-{{RAW_TEXT_PLACEHOLDER}}
-`;
+/* ========= RAW TEXT: ضع هنا نص الـ OCR إن رغبت افتراضياً ========= */
+let RAW_TEXT = ""; // يمكن تركه فارغًا ثم استيراده كملف TXT أو لصقه في المربع داخل الصفحة.
 
-/* ========= 2) محلّل تلقائي لتقسيم النص إلى: فصل → دروس → نواتج → مؤشرات =========
-   ملاحظات OCR:
-   - "الفصل" تظهر غالبًا "لصفلا" + رقم.
-   - "ناتج التعلم" تظهر أحيانًا مقلوبة/ملتبسة: "جتان" أو "ناتج".
-   - "المؤشر" تظهر "رشؤلما" أو "المؤشر".
-   الاستراتيجية:
-   - نقسم أولاً إلى فصول على أساس /(لصفلا\\s*\\d+)/.
-   - داخل كل فصل، نحاول اقتناص الدروس بخيوط كلمات (أنماط/خطة/تمثيل/القسمة/الضرب/الجمع/الطرح/الكسور/العبارات/جداول/ترتيب/تقريب/تقدير...).
-   - نلتقط نواتج التعلم بمفاتيح "ناتج" أو "جتان".
-   - نلتقط المؤشرات بمفتاح "المؤشر" أو "رشؤلما".
-   - نحفظ كل النص أيضًا كـ fallback حتى لا يضيع شيء.
+/* ========= محلّل تلقائي لتقسيم النص إلى: فصل → دروس → LO → مؤشرات =========
+   ملاحظات OCR المحتملة:
+   - "الفصل" قد تظهر سليمة أو مع مسافات.
+   - "ناتج التعلم" قد تظهر "ناتج" أو "جتان" (معكوسة) أو ناقصة.
+   - "المؤشر" قد تظهر "المؤشر" أو ملتبسة؛ نلتقط أيضًا سطور مرقّمة 1- ، 2- ... كبديل.
 */
 function parseToData(raw){
   const data = {};
-  const cleaned = raw.replace(/\u200f|\u200e/g,'').replace(/\s+\n/g,"\n").replace(/[ \t]+/g,' ');
-  const chapSplit = cleaned.split(/(?=لصفلا\s*\d+)/g).map(s=>s.trim()).filter(Boolean);
+  const cleaned = (raw||"")
+      .replace(/\u200f|\u200e/g,'')
+      .replace(/\r/g,'')
+      .replace(/[ \t]+\n/g,"\n")
+      .replace(/[ \t]+/g,' ')
+      .trim();
 
-  chapSplit.forEach(ch => {
-    const chapMatch = ch.match(/لصفلا\s*(\d+)/);
-    const chapNo = chapMatch ? chapMatch[1] : "?";
-    const unitName = `الفصل ${chapNo}`;
-    if(!data[unitName]) data[unitName] = { lessons: {}, _raw: ch };
+  if(!cleaned){ return defaultEmptyDATA(); }
 
-    // خيط مرشح لعناوين الدروس الشائعة في رابع
-    const lessonCandidates = ch.split(/\n/).filter(line=>{
-      return /(?:برض|سمق|معج|حرط|طامن|خطة|لاودج|لاود|سايق|ةميق|ةقيرت|ةدق|ةلكش|تانايب|رابتعا|ةرابتعا|جمل|عبارات|القسمة|الضرب|الجمع|الطرح|الكسور|الدوال|العمليات)/.test(line);
+  // قسّم إلى فصول: "الفصل X" (يدعم أرقام عربية وهندية)
+  const chapterRegex = /(الفصل)\s*([0-9\u0660-\u0669]+)/g;
+  const parts = [];
+  let m, lastIndex=0;
+  while((m = chapterRegex.exec(cleaned)) !== null){
+    if(m.index > lastIndex){
+      parts.push({title: null, body: cleaned.slice(lastIndex, m.index)});
+    }
+    parts.push({title: `الفصل ${toArabicDigits(m[2])}`, body: ""});
+    lastIndex = chapterRegex.lastIndex;
+  }
+  if(lastIndex < cleaned.length){
+    parts.push({title: null, body: cleaned.slice(lastIndex)});
+  }
+
+  // دمج الأجسام مع عناوينها
+  const chapters = [];
+  for(let i=0;i<parts.length;i++){
+    if(parts[i].title){
+      let body = "";
+      // اجمع النص حتى الفصل التالي
+      for(let j=i+1;j<parts.length && !parts[j].title;j++){ body += parts[j].body; i=j; }
+      chapters.push({title: parts[i].title, body: body.trim()});
+    }
+  }
+  // لو ما تعرف على "الفصل" سنعتبر كل النص فصل واحد
+  if(chapters.length===0){
+    chapters.push({title: "الفصل 1", body: cleaned});
+  }
+
+  chapters.forEach(ch=>{
+    const unitName = ch.title;
+    data[unitName] = { lessons: {}, _raw: ch.body };
+
+    // استنتاج عناوين الدروس: سطور تحتوي كلمات شائعة للدروس
+    const lines = ch.body.split(/\n/).map(s=>s.trim()).filter(Boolean);
+    const lessonIndices = [];
+    const lessonTitles = [];
+
+    lines.forEach((ln, idx)=>{
+      if(/(?:الدرس|أنماط|خطة|استقصاء|تمثيل|ترتيب|تقريب|تقدير|الجمع|الطرح|الضرب|القسمة|الكسور|الدوال|العبارات|المعادلات)/.test(ln)
+         && ln.length > 4){
+        lessonIndices.push(idx);
+        lessonTitles.push(normalizeLessonTitle(ln));
+      }
     });
 
-    // نسق أوّلي: كل سطر مرشّح نعدّه "درس" ونقص منه نصوص الـLO/المؤشرات من السياق
-    const uniqueLessons = [];
-    lessonCandidates.forEach(l=>{
-      const t=l.trim();
-      if(t.length < 5) return;
-      if(!uniqueLessons.some(u=>u.includes(t) || t.includes(u))) uniqueLessons.push(t);
-    });
-
-    // fallback لو ما تعرف على دروس كفاية: درس عام
-    if(uniqueLessons.length===0){
+    // لا توجد دروس واضحة → درس عام
+    if(lessonIndices.length===0){
+      const block = lines.join("\n");
       data[unitName].lessons["(نص هذا الفصل)"] = {
-        learningOutcomes: [extractAllLO(ch)],
-        indicators: extractAllIndicators(ch),
-        _raw: ch
+        learningOutcomes: splitLO(block),
+        indicators: splitIndicators(block),
+        _raw: block
       };
       return;
     }
 
-    uniqueLessons.forEach((lesson,i)=>{
-      // خذ مقطع هذا الدرس حتى بداية الدرس التالي
-      const startIdx = ch.indexOf(lesson);
-      const endIdx = (i<uniqueLessons.length-1) ? ch.indexOf(uniqueLessons[i+1]) : ch.length;
-      const block = ch.slice(startIdx, endIdx);
-
-      data[unitName].lessons[normalizeLessonTitle(lesson)] = {
+    // قصّ كل درس بمؤشره
+    lessonIndices.forEach((startIdx, k)=>{
+      const endIdx = (k < lessonIndices.length-1) ? lessonIndices[k+1] : lines.length;
+      const block = lines.slice(startIdx, endIdx).join("\n");
+      const title = lessonTitles[k] || `الدرس ${k+1}`;
+      data[unitName].lessons[title] = {
         learningOutcomes: splitLO(block),
         indicators: splitIndicators(block),
         _raw: block
@@ -245,33 +258,29 @@ function parseToData(raw){
 }
 
 function normalizeLessonTitle(t){
-  // نظف شوائب OCR الواضحة
-  return t.replace(/[^\u0600-\u06FF0-9\s:،\-]/g,'').replace(/\s+/g,' ').trim().slice(0,80);
+  return t.replace(/[^\u0600-\u06FF0-9\s:،\-]/g,'').replace(/\s+/g,' ').trim().slice(0,90);
+}
+
+function splitLO(block){
+  // التقط مقاطع تبدأ بكلمات ناتج التعلم المحتملة
+  const loLines = [];
+  block.split(/\n/).forEach(l=>{
+    if(/(?:ناتج(?:\s*التعل)|ناتج|جتان)/.test(l)) loLines.push(cleanLine(l));
+  });
+  if(loLines.length) return loLines;
+
+  // بديل: قص حسب نمط
+  const parts = block.split(/(?:(?:ناتج|جتان).{0,10}(?:التعل|ملتع))/).map(s=>s.trim()).filter(Boolean);
+  if(parts.length>1){ return parts.slice(1).map(cleanLine); }
+
+  const all = extractAllLO(block);
+  return all ? [all] : ["(لم يُلتقط ناتج تعلم واضح من هذا الدرس – راجع النص الأصلي)"];
 }
 
 function extractAllLO(txt){
   const lines = txt.split(/\n/).filter(Boolean);
   const lo = lines.filter(l=>/(?:ناتج|جتان|ناتج التعل)/.test(l)).join(' ').trim();
-  return lo || "(نص الفصل دون تمييز نواتج واضح بسبب OCR)";
-}
-
-function extractAllIndicators(txt){
-  const inds = [];
-  const lines = txt.split(/\n/).filter(Boolean);
-  lines.forEach(l=>{
-    if(/(?:المؤشر|رشؤلما)/.test(l)) inds.push(cleanLine(l));
-  });
-  return inds.length? inds : ["(مؤشرات هذا المقطع لم تظهر بوضوح بسبب OCR – النص الكامل محفوظ أدناه)"];
-}
-
-function splitLO(block){
-  const parts = block.split(/(?:(?:ناتج|جتان).{0,10}(?:التعل|ملتع))/).map(s=>s.trim()).filter(Boolean);
-  if(parts.length<=1){
-    const all = extractAllLO(block);
-    return all? [all] : ["(ناتج/نواتج غير معرّفة بدقة في هذا الدرس – راجع النص الأصلي)"];
-  }
-  // أول جزء قبل النمط قد يكون مقدمة؛ خذ البقية كنواتج
-  return parts.slice(1).map(cleanLine);
+  return lo || "";
 }
 
 function splitIndicators(block){
@@ -279,54 +288,65 @@ function splitIndicators(block){
   block.split(/\n/).forEach(l=>{
     if(/(?:المؤشر|رشؤلما)/.test(l)) inds.push(cleanLine(l));
   });
-  // في بعض الأحيان المؤشرات تأتي متتابعة بدون كلمة المؤشر: التقط أسطر مرقّمة 1-… 2-… الخ
+  // بديل: أسطر مرقمة 1- ، 2- … كـ مؤشرات
   if(inds.length===0){
     const numbered = block.match(/(?:^|\n)\s*(\d{1,2}\s*[-–]\s*.+?)(?=\n|$)/g);
     if(numbered) numbered.forEach(x=>inds.push(cleanLine(x)));
   }
-  return inds.length? inds : ["(لا توجد مؤشرات واضحة ـ راجع النص الأصلي أسفل)"];
+  return inds.length? inds : ["(لم تُلتقط مؤشرات واضحة — راجع النص الأصلي)"];
 }
 
 function cleanLine(s){
-  return s.replace(/[^\u0600-\u06FF0-9\s:،().=<>\-]/g,'').replace(/\s+/g,' ').trim();
+  return (s||"").replace(/[^\u0600-\u06FF0-9\s:،().=<>\-]/g,'').replace(/\s+/g,' ').trim();
 }
 
-/* ========= 3) نبني DATA من RAW_TEXT، ونملأ القوائم ========= */
+function toArabicDigits(str){
+  return String(str).replace(/\d/g, d=> "٠١٢٣٤٥٦٧٨٩"[d]);
+}
+function defaultEmptyDATA(){
+  return {"الفصل 1":{lessons:{}}};
+}
+
+/* ========= بناء DATA من RAW_TEXT ========= */
 let DATA = parseToData(RAW_TEXT);
 
-/* مفاتيح التخزين */
-const KEY_ROWS="rafid_g4_rows";
-const KEY_META="rafid_g4_meta";
-const KEY_STAMP="rafid_g4_stamp";
+/* ======= التخزين والواجهة ======= */
+const KEY_ROWS="rafid_g4_rows_v2";
+const KEY_META="rafid_g4_meta_v2";
+const KEY_STAMP="rafid_g4_stamp_v2";
 
-/* عناصر DOM */
 const unitSel=document.getElementById("unitSel");
 const lessonSel=document.getElementById("lessonSel");
 const loSel=document.getElementById("loSel");
 const indSel=document.getElementById("indSel");
 const qTxt=document.getElementById("qTxt");
 const qFile=document.getElementById("qFile");
+const rawFile=document.getElementById("rawFile");
+const reparseBtn=document.getElementById("reparseBtn");
+const rawTextArea=document.getElementById("rawTextArea");
 const tbody=document.querySelector("#grid tbody");
 const studentName=document.getElementById("studentName");
 const className=document.getElementById("className");
 const dateVal=document.getElementById("dateVal");
-document.getElementById("rawDump").textContent = RAW_TEXT.trim();
 
 /* تعبئة القوائم */
 function fillUnits(){
   unitSel.innerHTML="";
   Object.keys(DATA).forEach(u=>{
-    if(u.startsWith("الفصل")) {
+    if(u.startsWith("الفصل")){
       const o=document.createElement("option");o.value=o.textContent=u;unitSel.appendChild(o);
     }
   });
+  if(!unitSel.value){
+    const o=document.createElement("option");o.value=o.textContent="(لا توجد فصول بعد)";unitSel.appendChild(o);
+  }
 }
 function fillLessons(){
   const unit=unitSel.value;
   lessonSel.innerHTML=""; loSel.innerHTML=""; indSel.innerHTML="";
-  if(!unit) return;
+  if(!unit || !DATA[unit]) return;
   const lessons = Object.keys(DATA[unit].lessons);
-  if(lessons.length===0){ // fallback
+  if(lessons.length===0){
     const o=document.createElement("option");o.value=o.textContent="(نص هذا الفصل)";lessonSel.appendChild(o);
   }else{
     lessons.forEach(l=>{
@@ -339,7 +359,7 @@ function fillLOs(){
   const unit=unitSel.value, lesson=lessonSel.value;
   loSel.innerHTML=""; indSel.innerHTML="";
   if(!unit||!lesson) return;
-  const L = DATA[unit].lessons[lesson] || {learningOutcomes:[ "(لا يوجد ناتج محدد – راجع النص الأصلي)"], indicators:["(لا يوجد مؤشر محدد – راجع النص الأصلي)"]};
+  const L = (DATA[unit].lessons[lesson]) || {learningOutcomes:["(لا يوجد ناتج محدد)"],indicators:["(لا يوجد مؤشر محدد)"]};
   L.learningOutcomes.forEach(lo=>{
     const o=document.createElement("option");o.value=o.textContent=lo;loSel.appendChild(o);
   });
@@ -421,7 +441,8 @@ function exportJSON(){
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="rafid_grade4_data.json"; a.click();
   URL.revokeObjectURL(a.href);
 }
-function importJSON(file){
+document.getElementById("jsonIn").addEventListener("change", (ev)=>{
+  const file=ev.target.files[0]; if(!file) return;
   const fr=new FileReader();
   fr.onload=e=>{
     try{
@@ -429,12 +450,12 @@ function importJSON(file){
       if(d.dataSnapshot){ DATA=d.dataSnapshot; }
       localStorage.setItem(KEY_ROWS, JSON.stringify(d.rows||[]));
       localStorage.setItem(KEY_META, JSON.stringify(d.meta||{}));
-      fillUnits(); fillLessons(); // لو تغيرت DATA
+      fillUnits(); fillLessons();
       load();
     }catch{ alert("ملف JSON غير صالح"); }
   };
   fr.readAsText(file,'utf-8');
-}
+});
 
 /* استيراد سؤال من ملف نصي */
 qFile.addEventListener("change", ()=>{
@@ -444,29 +465,39 @@ qFile.addEventListener("change", ()=>{
   fr.readAsText(f,'utf-8');
 });
 
-/* أدوات مساعدة */
-function escapeHtml(s){return (s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+/* استيراد نص المصدر (TXT) + إعادة التفكيك */
+rawFile.addEventListener("change", ()=>{
+  const f=rawFile.files[0]; if(!f) return;
+  const fr=new FileReader();
+  fr.onload=e=>{
+    RAW_TEXT = e.target.result || "";
+    rawTextArea.value = RAW_TEXT;
+    rebuildDATAFromRAW();
+  };
+  fr.readAsText(f,'utf-8');
+});
+reparseBtn.addEventListener("click", rebuildDATAFromRAW);
+function rebuildDATAFromRAW(){
+  RAW_TEXT = rawTextArea.value || RAW_TEXT || "";
+  DATA = parseToData(RAW_TEXT);
+  fillUnits(); fillLessons();
+}
 
-/* تشغيل */
-unitSel.addEventListener("change", fillLessons);
-lessonSel.addEventListener("change", fillLOs);
-fillUnits(); fillLessons(); load();
-
-/* للتدقيق اليدوي: طباعة DATA في الكونسول */
-console.log("DATA (parsed):", DATA);
-/* تجهيز صفحة السؤال عند الطباعة */
+/* تجهيز صفحة السؤال عند الطباعة (الصفحة الثانية) */
 function prepareQuestionPage(){
-  document.getElementById("qPrint").textContent = qTxt.value.trim() || "(لم تتم كتابة سؤال)";
+  document.getElementById("qPrint").textContent =
+    qTxt.value.trim()
+    || "(لم تتم كتابة سؤال)";
 }
 window.addEventListener("beforeprint", prepareQuestionPage);
 
+/* أدوات مساعدة */
+function escapeHtml(s){return (s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+/* تشغيل أولي */
+document.getElementById("savedAt").textContent="";
+rawTextArea.value = RAW_TEXT; // لو عندك نص افتراضي
+fillUnits(); fillLessons(); load();
 </script>
 </body>
 </html>
-
-<div id="gridPage"></div>
-
-<div id="questionPage" style="display:none">
-  <h2>السؤال</h2>
-  <div class="q-print" id="qPrint"></div>
-</div>
