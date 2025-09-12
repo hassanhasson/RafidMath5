@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RafidMath5 – قياس ناتج التعلم</title>
+<title>RafidGrade4 – قياس ناتج التعلم (رابع ابتدائي)</title>
 <style>
   :root{--b:#d9dde3;--bg:#fff;--muted:#666;--accent:#0b5cad}
   *{box-sizing:border-box}
   body{margin:0;background:#f6f7f9;font-family:"Tahoma","Cairo",system-ui}
-  .wrap{max-width:1100px;margin:28px auto;padding:16px;background:#fff;border:1px solid var(--b);border-radius:10px}
+  .wrap{max-width:1150px;margin:28px auto;padding:16px;background:#fff;border:1px solid var(--b);border-radius:10px}
   header{border-bottom:1px solid var(--b);padding-bottom:12px;margin-bottom:14px}
   h1{margin:0;text-align:center}
   .student-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
@@ -26,12 +26,16 @@
   th,td{border:1px solid var(--b);padding:10px;vertical-align:top}
   th{background:#f0f4f8}
   .meta{font-size:12px;color:var(--muted)}
+  details{background:#fafafa;border:1px solid var(--b);border-radius:8px;padding:8px}
+  summary{cursor:pointer;font-weight:bold}
+  pre{white-space:pre-wrap;direction:rtl;font-family:inherit;margin:8px 0 0}
+  .muted{color:#777}
   @media (max-width:900px){.grid{grid-template-columns:1fr 1fr}}
   @media (max-width:560px){.grid,.student-grid{grid-template-columns:1fr}}
   @media print{
     body{background:#fff}
     .wrap{border:none;margin:0;max-width:none;border-radius:0}
-    .toolbar,.q-actions{display:none}
+    .toolbar,.q-actions,details{display:none}
     th{background:#eaeaea!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   }
 </style>
@@ -39,7 +43,7 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>قياس ناتج التعلم</h1>
+    <h1>قياس ناتج التعلم – الصف الرابع</h1>
     <div class="student-grid" aria-label="بيانات الطالب">
       <div class="field">
         <label for="studentName">اسم الطالب</label>
@@ -47,7 +51,7 @@
       </div>
       <div class="field">
         <label for="className">الصف/الشعبة</label>
-        <input id="className" placeholder="مثال: 5/أ">
+        <input id="className" placeholder="مثال: 4/ب">
       </div>
       <div class="field">
         <label for="dateVal">التاريخ</label>
@@ -56,6 +60,7 @@
     </div>
   </header>
 
+  <!-- القوائم المنسدلة -->
   <div class="grid" aria-label="اختيارات مترابطة">
     <div class="field">
       <label for="unitSel">الفصل</label>
@@ -75,6 +80,7 @@
     </div>
   </div>
 
+  <!-- خانة السؤال أسفل + استيراد من ملف -->
   <div class="qbox">
     <div class="field">
       <label for="qTxt">السؤال</label>
@@ -100,6 +106,7 @@
     <span class="meta" id="savedAt"></span>
   </div>
 
+  <!-- الجدول النهائي -->
   <table id="grid">
     <thead>
       <tr>
@@ -116,276 +123,141 @@
     <tbody></tbody>
   </table>
 
-  <p class="meta">اختر الفصل ثم الدرس ثم ناتج التعلم ثم المؤشر. أضف سؤالك ثم “إضافة صف”.</p>
+  <p class="meta">لو لاحظت سطر ناقص بسبب OCR، افتح “إظهار النص الأصلي” تحت، عدّل بسرعة، واضغط حفظ.</p>
+
+  <!-- النص الأصلي المستخرج للفصول لمراجعة بشرية عند الحاجة -->
+  <details style="margin-top:12px">
+    <summary>إظهار النص الأصلي (مصدر OCR) للمطابقة/التصحيح</summary>
+    <p class="muted">هذا النص هو المصدر الخام من ملفك، وقد يحوي التواءات بسيطة في الحروف. استخدمه للمطابقة عند الحاجة.</p>
+    <pre id="rawDump"></pre>
+  </details>
 </div>
 
 <script>
-/* ========= DATA: النصوص الكاملة كما في الصور ========= */
-const DATA = {
-  "الفصل 1: القيمة المنزلية": { lessons: {
-    "القيمة المنزلية ضمن البلايين": {
-      learningOutcomes: [
-        "ناتج التعلّم (1): وصف الأعداد ضمن 12 منزلة، وتمثيل هذه الأعداد، وقراءتها، وكتابتها، والمقارنة بينها، وترتيبها، وتقديرها."
-      ],
-      indicators: [
-        "المؤشر 1-1: يميز القيمة المنزلية لرقم في عدد ضمن 12 منزلة، ويمثل الأعداد باستخدام الرسوم وخط الأعداد، ويُقدِّر إلى أقرب منزلة معطاة.",
-        "المؤشر 1-2: يقرأ الأعداد ضمن 12 منزلة، ويكتبها في الصور القياسية، واللفظية، والتحليلية."
-      ]
-    },
-    "المقارنة بين الأعداد": {
-      learningOutcomes: [
-        "ناتج التعلّم (1): وصف الأعداد ضمن 12 منزلة، وتمثيل هذه الأعداد، وقراءتها، وكتابتها، والمقارنة بينها، وترتيبها، وتقديرها."
-      ],
-      indicators: [
-        "المؤشر 1-3: يقارن بين الأعداد ضمن 12 منزلة باستخدام الرموز ( < ، > ، = )، ويرتبها تصاعدياً وتنازلياً."
-      ]
-    },
-    "تمثيل الكسور العشرية": {
-      learningOutcomes: [
-        "ناتج التعلّم (2): وصف الكسور العشرية، وتمثيلها، وتمييز القيمة المنزلية لرقم فيها، وقراءتها، وكتابتها، والمقارنة بينها وترتيبها، وتقديرها، والتحويل بينها وبين الكسور الاعتيادية والأعداد الكسرية."
-      ],
-      indicators: [
-        "المؤشر 2-2: يصف الكسر العشري، ويمثله باستخدام النماذج، والرسوم، وخط الأعداد، ويميز القيمة المنزلية لرقم فيه، فيقرأه ويكتبه، ويمثل هذه الأعداد كنسبة مئوية، ويحولها.",
-        "المؤشر 2-3: يقرأ الكسور العشرية، ويكتبها في الصور القياسية، واللفظية، والتحليلية."
-      ]
-    },
-    "القيمة المنزلية ضمن أجزاء الألف": {
-      learningOutcomes: [
-        "ناتج التعلّم (2): وصف الكسور العشرية، وتمثيلها، وتمييز القيمة المنزلية لرقم فيها، وقراءتها، وكتابتها، والمقارنة بينها وترتيبها، وتقديرها، والتحويل بينها وبين الكسور الاعتيادية والأعداد الكسرية."
-      ],
-      indicators: [
-        "المؤشر 2-4: يقارن بين الكسور العشرية، ويرتبها تصاعدياً وتنازلياً."
-      ]
-    },
-    "مقارنة الكسور العشرية": {
-      learningOutcomes: [
-        "ناتج التعلّم (2): وصف الكسور العشرية، وتمثيلها، وتمييز القيمة المنزلية لرقم فيها، وقراءتها، وكتابتها، والمقارنة بينها وترتيبها، وتقديرها، والتحويل بينها وبين الكسور الاعتيادية والأعداد الكسرية."
-      ],
-      indicators: [
-        "المؤشر 1-4: يقارن بين الكسور العشرية، ويرتبها تصاعدياً وتنازلياً."
-      ]
-    },
-    "ترتيب الأعداد والكسور العشرية": {
-      learningOutcomes: [
-        "ناتج التعلّم (1): وصف الأعداد ضمن 12 منزلة… وترتيبها وتقديرها.",
-        "ناتج التعلّم (2): وصف الكسور العشرية… وترتيبها وتقديرها."
-      ],
-      indicators: [
-        "المؤشر 1-3: يقارن ويرتب الأعداد.",
-        "المؤشر 2-4: يقارن ويرتب الكسور العشرية."
-      ]
-    }
-  }},
+/* ========= 1) نص المصدر الخام (من ملفك PDF) — مضمّن هنا ========= */
+const RAW_TEXT = `
+{{RAW_TEXT_PLACEHOLDER}}
+`;
 
-  "الفصل 2: الجمع والطرح": { lessons: {
-    "تقريب الأعداد والكسور العشرية": {
-      learningOutcomes: [
-        "ناتج التعلّم (2): وصف الكسور العشرية، وتمثيلها، وتمييز القيمة المنزلية لرقم فيها، وقراءتها، وكتابتها، والمقارنة بينها وترتيبها، وتقديرها، والتحويل بينها وبين الكسور الاعتيادية والأعداد الكسرية."
-      ],
-      indicators: [
-        "المؤشر 2-3: يصف الكسر العشري، ويمثله باستخدام النماذج، والرسوم، وخط الأعداد، ويميز القيمة المنزلية لرقم فيه، فيقرأه ويكتبه، ويمثل هذه الأعداد كنسبة مئوية، ويحولها."
-      ]
-    },
-    "تقدير نواتج الجمع والطرح": {
-      learningOutcomes: [
-        "ناتج التعلّم (9): جمع الكسور العشرية، وطرحها، وقسمتها، واستخدامها في حل مسائل رياضية.",
-        "ناتج التعلّم (10): تقدير نواتج العمليات الأربع على الأعداد الكلية، والكسور، واستخدام الحساب الذهني."
-      ],
-      indicators: [
-        "المؤشر 10-1: يقدِّر نواتج جمع الأعداد الكلية، والكسور، والكسور العشرية، وطرحها، وضربها، وقسمتها باستخدام التقريب أو الأعداد المتنامية."
-      ]
-    },
-    "جمع الكسور العشرية وطرحها": {
-      learningOutcomes: [
-        "ناتج التعلّم (9): جمع الكسور العشرية، وطرحها، وقسمتها، واستخدامها في حل مسائل رياضية."
-      ],
-      indicators: [
-        "المؤشر 9-8: يجمع الكسور العشرية حتى الجزء من ألف، ويطرحها، ويقسمها.",
-        "المؤشر 9-9: يجعل مسائل رياضية من ثلاث خطوات على الأكثر تتضمن تطبيقات حياتية على العمليات الأربع على الكسور العشرية، ويفسر حلها."
-      ]
-    }
-  }},
+/* ========= 2) محلّل تلقائي لتقسيم النص إلى: فصل → دروس → نواتج → مؤشرات =========
+   ملاحظات OCR:
+   - "الفصل" تظهر غالبًا "لصفلا" + رقم.
+   - "ناتج التعلم" تظهر أحيانًا مقلوبة/ملتبسة: "جتان" أو "ناتج".
+   - "المؤشر" تظهر "رشؤلما" أو "المؤشر".
+   الاستراتيجية:
+   - نقسم أولاً إلى فصول على أساس /(لصفلا\\s*\\d+)/.
+   - داخل كل فصل، نحاول اقتناص الدروس بخيوط كلمات (أنماط/خطة/تمثيل/القسمة/الضرب/الجمع/الطرح/الكسور/العبارات/جداول/ترتيب/تقريب/تقدير...).
+   - نلتقط نواتج التعلم بمفاتيح "ناتج" أو "جتان".
+   - نلتقط المؤشرات بمفتاح "المؤشر" أو "رشؤلما".
+   - نحفظ كل النص أيضًا كـ fallback حتى لا يضيع شيء.
+*/
+function parseToData(raw){
+  const data = {};
+  const cleaned = raw.replace(/\u200f|\u200e/g,'').replace(/\s+\n/g,"\n").replace(/[ \t]+/g,' ');
+  const chapSplit = cleaned.split(/(?=لصفلا\s*\d+)/g).map(s=>s.trim()).filter(Boolean);
 
-  "الفصل 3: الضرب": { lessons: {
-    "أنماط الضرب": {
-      learningOutcomes: [
-        "ناتج التعلّم (4): جمع الأعداد الكلية ضمن سبع منازل، وطرحها، وضرب الأعداد من ثلاث منازل على الأكثر، وقسمتها على عدد من منزلتين على الأكثر، واستخدامها في حل مسائل رياضية."
-      ],
-      indicators: [
-        "المؤشر 3-1: يستخدم الحساب الذهني لإيجاد حاصل ضرب عدد من منزلتين على الأكثر، وقسمته، وعلى مضاعفات (10، 100، 1000…)."
-      ]
-    },
-    "خاصية التوزيع": {
-      learningOutcomes: [
-        "ناتج التعلّم (4): جمع الأعداد الكلية ضمن سبع منازل، وطرحها، وضرب الأعداد من ثلاث منازل على الأكثر… واستخدامها في حل مسائل."
-      ],
-      indicators: [
-        "المؤشر 3-2: يستخدم خاصية التوزيع لضرب عدد من منزلتين في عدد من منزلة واحدة ذهنيًا."
-      ]
-    },
-    "تقدير نواتج الضرب": {
-      learningOutcomes: [
-        "ناتج التعلّم (10): تقدير نواتج العمليات الأربع على الأعداد الكلية، والكسور، واستخدام الحساب الذهني."
-      ],
-      indicators: [
-        "المؤشر 10-1: يقدِّر نواتج العمليات باستخدام التقريب أو الأعداد المتنامية."
-      ]
-    },
-    "الضرب في عدد من رقم واحد": {
-      learningOutcomes: [
-        "ناتج التعلّم (4): جمع/طرح/ضرب/قسمة الأعداد ضمن الحدود المحددة واستخدامها في حل مسائل."
-      ],
-      indicators: [
-        "المؤشر 4-2: يضرب عددًا من ثلاث منازل على الأكثر في عدد من منزلتين على الأكثر باستخدام الاستراتيجيات المعتمدة على القيمة المنزلية (دون ومع إعادة التجميع)."
-      ]
-    },
-    "الضرب في عدد من رقمين": {
-      learningOutcomes: [
-        "ناتج التعلّم (4): جمع/طرح/ضرب/قسمة الأعداد ضمن الحدود المحددة واستخدامها في حل مسائل."
-      ],
-      indicators: [
-        "المؤشر 4-3: يضرب عددًا من ثلاث منازل على الأكثر في عدد من منزلتين على الأكثر باستخدام الاستراتيجيات المعتمدة على القيمة المنزلية (دون ومع إعادة التجميع)."
-      ]
-    },
-    "استقصاء: حل المسألة": {
-      learningOutcomes: [
-        "ناتج التعلّم (10): تقدير نواتج العمليات الأربع على الأعداد الكلية، والكسور، واستخدام الحساب الذهني."
-      ],
-      indicators: [
-        "المؤشر 4-4: يجعل مسائل رياضية من ثلاث خطوات على الأكثر تتضمن تطبيقات حياتية على العمليات الأربع، ويفسر حلها."
-      ]
-    }
-  }},
+  chapSplit.forEach(ch => {
+    const chapMatch = ch.match(/لصفلا\s*(\d+)/);
+    const chapNo = chapMatch ? chapMatch[1] : "?";
+    const unitName = `الفصل ${chapNo}`;
+    if(!data[unitName]) data[unitName] = { lessons: {}, _raw: ch };
 
-  "الفصل 4: القسمة": { lessons: {
-    "أنماط القسمة": {
-      learningOutcomes: [
-        "ناتج التعلّم (4): جمع الأعداد الكلية ضمن سبع منازل، وطرحها، وضربها، وقسمتها… واستخدامها في حل مسائل."
-      ],
-      indicators: [
-        "المؤشر 4-1: يستخدم الحساب الذهني لإيجاد حاصل ضرب عدد من منزلتين على الأكثر، وقسمته، وعلى مضاعفات (10، 100، 1000…)."
-      ]
-    },
-    "القسمة على عدد من رقم واحد": {
-      learningOutcomes: [
-        "ناتج التعلّم (10): تقدير نواتج العمليات الأربع على الأعداد الكلية، والكسور، واستخدام الحساب الذهني."
-      ],
-      indicators: [
-        "المؤشر 4-2: يقسم عددًا من أربع منازل على الأكثر على عدد من منزلتين على الأكثر باستخدام الاستراتيجيات المعتمدة على القيمة المنزلية (دون ومع إعادة التجميع)."
-      ]
-    },
-    "القسمة على عدد من رقمين": {
-      learningOutcomes: [
-        "ناتج التعلّم (10): تقدير نواتج العمليات الأربع على الأعداد الكلية، والكسور، واستخدام الحساب الذهني."
-      ],
-      indicators: [
-        "المؤشر 4-3: يقسم عددًا من أربع منازل على الأكثر على عدد من منزلتين على الأكثر باستخدام الاستراتيجيات المعتمدة على القيمة المنزلية (دون ومع إعادة التجميع)."
-      ]
-    },
-    "خطة حل المسألة: تمثيل المعطيات": {
-      learningOutcomes: [
-        "ناتج التعلّم (10): تقدير نواتج العمليات الأربع على الأعداد الكلية، والكسور، واستخدام الحساب الذهني."
-      ],
-      indicators: [
-        "المؤشر 4-4: يجعل مسائل رياضية من ثلاث خطوات على الأكثر تتضمن تطبيقات حياتية على العمليات الأربع، ويفسر حلها."
-      ]
-    }
-  }},
+    // خيط مرشح لعناوين الدروس الشائعة في رابع
+    const lessonCandidates = ch.split(/\n/).filter(line=>{
+      return /(?:برض|سمق|معج|حرط|طامن|خطة|لاودج|لاود|سايق|ةميق|ةقيرت|ةدق|ةلكش|تانايب|رابتعا|ةرابتعا|جمل|عبارات|القسمة|الضرب|الجمع|الطرح|الكسور|الدوال|العمليات)/.test(line);
+    });
 
-  "الفصل 5: العبارات الجبرية والمعادلات": { lessons: {
-    "عبارات الجمع والطرح الجبرية": {
-      learningOutcomes: [
-        "ناتج التعلّم (11): تمييز أنماط عددية، وهندسية متنامية، والعلاقة في جدول، ووصفها، وتوسيعها، واستخدامها في حل مسائل رياضية."
-      ],
-      indicators: [
-        "المؤشر 12-1: يصف العبارة الجبرية، ويكتبها، بحيث تتضمن عمليتين على الأكثر مع استخدام الأقواس، ويُوجد قيمها باستخدام ترتيب العمليات.",
-        "المؤشر 12-2: يجعل مسائل رياضية تتضمن تطبيقات حياتية على العبارات العددية والجبرية، والمعادلات الخطية البسيطة، ويفسر حلها."
-      ]
-    },
-    "خطة حل المسألة (أبسط)": {
-      learningOutcomes: [
-        "ناتج التعلّم (11): تمييز أنماط عددية وهندسية متنامية… ووصفها وتوسيعها…"
-      ],
-      indicators: [
-        "المؤشر 12-3: يصف العبارة الجبرية، ويكتبها، ويكمل العناصر المفقودة فيها، ويكوّنها، ويعمّمها."
-      ]
-    },
-    "عبارات الضرب والقسمة الجبرية": {
-      learningOutcomes: [
-        "ناتج التعلّم (12): وصف العبارات العددية والجبرية، وتمييز المعادلة الخطية البسيطة، وكتابتها، وإيجاد قيمها، واستخدامها في حل مسائل رياضية."
-      ],
-      indicators: [
-        "المؤشر 12-4: يميز المعادلة الخطية البسيطة (ذات الخطوة الواحدة)، ويكتبها."
-      ]
-    },
-    "استقصاء حل المسألة": {
-      learningOutcomes: [
-        "ناتج التعلّم (12): وصف العبارات العددية والجبرية… واستخدامها في حل مسائل."
-      ],
-      indicators: [
-        "المؤشر 12-5: يجعل مسائل رياضية تتضمن تطبيقات حياتية على العبارات العددية، والجبرية، والمعادلات الخطية البسيطة، ويفسر حلها."
-      ]
-    },
-    "جداول الدوال": {
-      learningOutcomes: [
-        "ناتج التعلّم (12): وصف العبارات العددية والجبرية… واستخدامها في حل مسائل."
-      ],
-      indicators: [
-        "المؤشر 11-1: يربط العلاقة بين مجموعتين من البيانات في جدول الدوال، ويكتب المدخلات، والمخرجات، والرموز، ويبين فيه التغير الأحادي.",
-        "المؤشر 11-2: يكون جدول المدخلات والمخرجات، ويكمله، وفق قاعدة معطاة، ويتضمن عمليتين على الأكثر."
-      ]
-    },
-    "ترتيب العمليات": {
-      learningOutcomes: [
-        "ناتج التعلّم (12): وصف العبارات العددية والجبرية، وتمييز المعادلة الخطية البسيطة، وكتابتها، وإيجاد قيمها، واستخدامها في حل مسائل."
-      ],
-      indicators: [
-        "المؤشر 12-6: يصف العبارة الجبرية، ويكتبها، بحيث تتضمن عمليتين على الأكثر مع استخدام الأقواس، ويُوجد قيمها باستخدام ترتيب العمليات."
-      ]
-    },
-    "معادلات الجمع والطرح": {
-      learningOutcomes: [
-        "ناتج التعلّم (12): وصف العبارات العددية والجبرية، وتمييز المعادلة الخطية البسيطة، وكتابتها، وإيجاد قيمها، واستخدامها في حل مسائل."
-      ],
-      indicators: [
-        "المؤشر 12-7: يكتب معادلة خطية بسيطة ذهنيًا وكتابيًا باستخدام النماذج، ويتحقق من صحة الحل."
-      ]
-    }
-  }},
+    // نسق أوّلي: كل سطر مرشّح نعدّه "درس" ونقص منه نصوص الـLO/المؤشرات من السياق
+    const uniqueLessons = [];
+    lessonCandidates.forEach(l=>{
+      const t=l.trim();
+      if(t.length < 5) return;
+      if(!uniqueLessons.some(u=>u.includes(t) || t.includes(u))) uniqueLessons.push(t);
+    });
 
-  "الفصل 6: الكسور الاعتيادية": { lessons: {
-    "القسمة والكسور الاعتيادية": {
-      learningOutcomes: [
-        "ناتج التعلّم (2): تمييز الكسور الاعتيادية، والأعداد الكسرية، والكسور غير الفعلية، وتمثيلها، وقراءتها، وكتابتها، والمقارنة بينها، وترتيبها، وتقديرها."
-      ],
-      indicators: [
-        "المؤشر 2-1: يميز الكسر الاعتيادي، ويمثله باستخدام النماذج، والرسوم، وخط الأعداد، ويقرؤه، ويكتبه."
-      ]
-    },
-    "الكسور غير الفعلية": {
-      learningOutcomes: [
-        "ناتج التعلّم (2): تمييز الكسور الاعتيادية، والأعداد الكسرية، والكسور غير الفعلية، وتمثيلها، وقراءتها، وكتابتها، والمقارنة بينها، وترتيبها، وتقديرها."
-      ],
-      indicators: [
-        "المؤشر 2-3: يميز العدد الكسري، ويمثله باستخدام النماذج، والرسوم، وخط الأعداد، ويقرؤه، ويكتبه."
-      ]
-    },
-    "تقريب الكسور": {
-      learningOutcomes: [
-        "ناتج التعلّم (2): تمييز الكسور الاعتيادية، والأعداد الكسرية، والكسور غير الفعلية، وتمثيلها، وقراءتها، وكتابتها، والمقارنة بينها، وترتيبها، وتقديرها."
-      ],
-      indicators: [
-        "المؤشر 2-2: يميز الكسور الاعتيادية، ويمثلها باستخدام النماذج، والرسوم، وخط الأعداد، ويقرؤها، ويكتبها.",
-        "المؤشر 2-4: يوجد الكسور المكافئة لكسر، ويكتب الكسر في أبسط صورة، ويقرّبه إلى الصفر أو النصف أو الواحد."
-      ]
+    // fallback لو ما تعرف على دروس كفاية: درس عام
+    if(uniqueLessons.length===0){
+      data[unitName].lessons["(نص هذا الفصل)"] = {
+        learningOutcomes: [extractAllLO(ch)],
+        indicators: extractAllIndicators(ch),
+        _raw: ch
+      };
+      return;
     }
-  }}
-};
-/* ======= التخزين والواجهة ======= */
-const KEY_ROWS="rafid_math5_rows_v4";
-const KEY_META="rafid_math5_meta_v4";
-const KEY_STAMP="rafid_math5_stamp_v4";
 
+    uniqueLessons.forEach((lesson,i)=>{
+      // خذ مقطع هذا الدرس حتى بداية الدرس التالي
+      const startIdx = ch.indexOf(lesson);
+      const endIdx = (i<uniqueLessons.length-1) ? ch.indexOf(uniqueLessons[i+1]) : ch.length;
+      const block = ch.slice(startIdx, endIdx);
+
+      data[unitName].lessons[normalizeLessonTitle(lesson)] = {
+        learningOutcomes: splitLO(block),
+        indicators: splitIndicators(block),
+        _raw: block
+      };
+    });
+  });
+
+  return data;
+}
+
+function normalizeLessonTitle(t){
+  // نظف شوائب OCR الواضحة
+  return t.replace(/[^\u0600-\u06FF0-9\s:،\-]/g,'').replace(/\s+/g,' ').trim().slice(0,80);
+}
+
+function extractAllLO(txt){
+  const lines = txt.split(/\n/).filter(Boolean);
+  const lo = lines.filter(l=>/(?:ناتج|جتان|ناتج التعل)/.test(l)).join(' ').trim();
+  return lo || "(نص الفصل دون تمييز نواتج واضح بسبب OCR)";
+}
+
+function extractAllIndicators(txt){
+  const inds = [];
+  const lines = txt.split(/\n/).filter(Boolean);
+  lines.forEach(l=>{
+    if(/(?:المؤشر|رشؤلما)/.test(l)) inds.push(cleanLine(l));
+  });
+  return inds.length? inds : ["(مؤشرات هذا المقطع لم تظهر بوضوح بسبب OCR – النص الكامل محفوظ أدناه)"];
+}
+
+function splitLO(block){
+  const parts = block.split(/(?:(?:ناتج|جتان).{0,10}(?:التعل|ملتع))/).map(s=>s.trim()).filter(Boolean);
+  if(parts.length<=1){
+    const all = extractAllLO(block);
+    return all? [all] : ["(ناتج/نواتج غير معرّفة بدقة في هذا الدرس – راجع النص الأصلي)"];
+  }
+  // أول جزء قبل النمط قد يكون مقدمة؛ خذ البقية كنواتج
+  return parts.slice(1).map(cleanLine);
+}
+
+function splitIndicators(block){
+  const inds=[];
+  block.split(/\n/).forEach(l=>{
+    if(/(?:المؤشر|رشؤلما)/.test(l)) inds.push(cleanLine(l));
+  });
+  // في بعض الأحيان المؤشرات تأتي متتابعة بدون كلمة المؤشر: التقط أسطر مرقّمة 1-… 2-… الخ
+  if(inds.length===0){
+    const numbered = block.match(/(?:^|\n)\s*(\d{1,2}\s*[-–]\s*.+?)(?=\n|$)/g);
+    if(numbered) numbered.forEach(x=>inds.push(cleanLine(x)));
+  }
+  return inds.length? inds : ["(لا توجد مؤشرات واضحة ـ راجع النص الأصلي أسفل)"];
+}
+
+function cleanLine(s){
+  return s.replace(/[^\u0600-\u06FF0-9\s:،().=<>\-]/g,'').replace(/\s+/g,' ').trim();
+}
+
+/* ========= 3) نبني DATA من RAW_TEXT، ونملأ القوائم ========= */
+let DATA = parseToData(RAW_TEXT);
+
+/* مفاتيح التخزين */
+const KEY_ROWS="rafid_g4_rows";
+const KEY_META="rafid_g4_meta";
+const KEY_STAMP="rafid_g4_stamp";
+
+/* عناصر DOM */
 const unitSel=document.getElementById("unitSel");
 const lessonSel=document.getElementById("lessonSel");
 const loSel=document.getElementById("loSel");
@@ -396,34 +268,45 @@ const tbody=document.querySelector("#grid tbody");
 const studentName=document.getElementById("studentName");
 const className=document.getElementById("className");
 const dateVal=document.getElementById("dateVal");
+document.getElementById("rawDump").textContent = RAW_TEXT.trim();
 
+/* تعبئة القوائم */
 function fillUnits(){
   unitSel.innerHTML="";
   Object.keys(DATA).forEach(u=>{
-    const o=document.createElement("option");o.value=o.textContent=u;unitSel.appendChild(o);
+    if(u.startsWith("الفصل")) {
+      const o=document.createElement("option");o.value=o.textContent=u;unitSel.appendChild(o);
+    }
   });
 }
 function fillLessons(){
   const unit=unitSel.value;
   lessonSel.innerHTML=""; loSel.innerHTML=""; indSel.innerHTML="";
   if(!unit) return;
-  Object.keys(DATA[unit].lessons).forEach(l=>{
-    const o=document.createElement("option");o.value=o.textContent=l;lessonSel.appendChild(o);
-  });
+  const lessons = Object.keys(DATA[unit].lessons);
+  if(lessons.length===0){ // fallback
+    const o=document.createElement("option");o.value=o.textContent="(نص هذا الفصل)";lessonSel.appendChild(o);
+  }else{
+    lessons.forEach(l=>{
+      const o=document.createElement("option");o.value=o.textContent=l;lessonSel.appendChild(o);
+    });
+  }
   fillLOs();
 }
 function fillLOs(){
   const unit=unitSel.value, lesson=lessonSel.value;
   loSel.innerHTML=""; indSel.innerHTML="";
   if(!unit||!lesson) return;
-  DATA[unit].lessons[lesson].learningOutcomes.forEach(lo=>{
+  const L = DATA[unit].lessons[lesson] || {learningOutcomes:[ "(لا يوجد ناتج محدد – راجع النص الأصلي)"], indicators:["(لا يوجد مؤشر محدد – راجع النص الأصلي)"]};
+  L.learningOutcomes.forEach(lo=>{
     const o=document.createElement("option");o.value=o.textContent=lo;loSel.appendChild(o);
   });
-  DATA[unit].lessons[lesson].indicators.forEach(ind=>{
+  L.indicators.forEach(ind=>{
     const o=document.createElement("option");o.value=o.textContent=ind;indSel.appendChild(o);
   });
 }
 
+/* إضافة صف */
 function addRow(){
   const row={
     name: studentName.value.trim(),
@@ -450,6 +333,7 @@ function addRow(){
   qTxt.value="";
 }
 
+/* حفظ/استرجاع */
 function save(){
   const rows=[...tbody.querySelectorAll("tr")].map(tr=>{
     const t=[...tr.children].map(td=>td.textContent);
@@ -484,13 +368,15 @@ function load(){
   const s=localStorage.getItem(KEY_STAMP)||""; document.getElementById("savedAt").textContent=s?("آخر حفظ: "+s):"";
 }
 
+/* تصدير/استيراد JSON */
 function exportJSON(){
   const payload={
     meta:{name:studentName.value.trim(),cls:className.value.trim(),date:dateVal.value||""},
-    rows:JSON.parse(localStorage.getItem(KEY_ROWS)||"[]")
+    rows:JSON.parse(localStorage.getItem(KEY_ROWS)||"[]"),
+    dataSnapshot: DATA
   };
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json;charset=utf-8"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="rafid_math5_data.json"; a.click();
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="rafid_grade4_data.json"; a.click();
   URL.revokeObjectURL(a.href);
 }
 function importJSON(file){
@@ -498,26 +384,34 @@ function importJSON(file){
   fr.onload=e=>{
     try{
       const d=JSON.parse(e.target.result);
+      if(d.dataSnapshot){ DATA=d.dataSnapshot; }
       localStorage.setItem(KEY_ROWS, JSON.stringify(d.rows||[]));
       localStorage.setItem(KEY_META, JSON.stringify(d.meta||{}));
+      fillUnits(); fillLessons(); // لو تغيرت DATA
       load();
     }catch{ alert("ملف JSON غير صالح"); }
   };
   fr.readAsText(file,'utf-8');
 }
 
-document.getElementById("qFile").addEventListener("change", ()=>{
+/* استيراد سؤال من ملف نصي */
+qFile.addEventListener("change", ()=>{
   const f=qFile.files[0]; if(!f) return;
   const fr=new FileReader();
   fr.onload=e=>{ qTxt.value=(qTxt.value? qTxt.value+"\n":"")+e.target.result; };
   fr.readAsText(f,'utf-8');
 });
 
+/* أدوات مساعدة */
 function escapeHtml(s){return (s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 
+/* تشغيل */
 unitSel.addEventListener("change", fillLessons);
 lessonSel.addEventListener("change", fillLOs);
 fillUnits(); fillLessons(); load();
+
+/* للتدقيق اليدوي: طباعة DATA في الكونسول */
+console.log("DATA (parsed):", DATA);
 </script>
 </body>
 </html>
